@@ -20,16 +20,17 @@ An interactive, kid-friendly web application for elementary students to practice
 ```
 math-facts-elementry-2026/
 ├── index.html              # Login & Subject Selection
-├── styles.css              # Shared styles for all pages (1,142 lines)
+├── styles.css              # Shared styles for all pages (1,228 lines)
 ├── common.js               # Shared JavaScript functions (rewards, timer, sounds)
 ├── math.html               # Math Facts Practice ✅ COMPLETE
-├── spelling.html           # Spelling Practice ✅ COMPLETE
+├── spelling.html           # Spelling Practice ✅ COMPLETE (with M-W API)
 ├── spelling-words.js       # 750 Spelling words from Indiana Spell Bowl
 ├── vocabulary.html         # Vocabulary Builder ✅ COMPLETE
 ├── vocabulary-words.js     # 99 Vocabulary words (Word Wizard 3rd-5th)
 ├── science.html            # Science Practice ✅ COMPLETE
 ├── science-questions.js    # 80 Science questions (multiple choice)
 ├── geography.html          # Geography Practice (Template)
+├── MERRIAM_WEBSTER_SETUP.md  # Setup guide for M-W API
 ├── 3738-science-trivia-for-kids.pdf  # Source: Science trivia
 ├── science.pdf             # Source: Grade 4 Science Test
 ├── WordWizardVocabList3-5.pdf        # Source: Vocabulary words
@@ -45,6 +46,16 @@ math-facts-elementry-2026/
    - admin / admin789
 3. **Choose a subject**: Click on any subject card (Math, Spelling, Vocabulary, Science)
 4. **Start practicing**: Click "Start ▶️" to begin!
+
+### 🎤 Optional: Enable Merriam-Webster Pronunciation (Recommended)
+
+For **professional audio pronunciation** and **automatic definitions** on the spelling page:
+
+1. Get a FREE API key from https://dictionaryapi.com/ (1,000 requests/day)
+2. Follow the setup guide in [MERRIAM_WEBSTER_SETUP.md](MERRIAM_WEBSTER_SETUP.md)
+3. Add your API key to [spelling.html](spelling.html) line 83
+
+**Note:** The app works perfectly without the API - it uses browser text-to-speech. The M-W API just enhances quality!
 
 ## 📊 Project Status
 
@@ -95,18 +106,28 @@ math-facts-elementry-2026/
 - Hard: 13+ letters (60 words) - United States of America, electromagnetic, etc.
 
 **How It Works:**
-1. Browser speaks the word using Text-to-Speech
-2. Student types the spelling
-3. First mistake: Shows correct spelling, gives second chance
-4. Second mistake: Counts as wrong, moves to next word
-5. "🔊 Play Word" button to replay anytime
+1. Merriam-Webster School Dictionary API pronounces the word (professional audio)
+2. **Definition automatically displays** below the word
+3. Student types the spelling
+4. First mistake: Shows correct spelling, gives second chance
+5. Second mistake: Counts as wrong, moves to next word
+6. "🔊 Play Word" button to replay anytime
 
 **Special Features:**
-- Slower speech rate (0.8x) for clarity
+- **Merriam-Webster pronunciation** (real audio, not computer-generated)
+- **Auto-display definitions** from School Dictionary API
+- Smart fallback to Web Speech API (if offline or API unavailable)
+- Slower speech rate (0.8x) for clarity when using fallback
 - Case-insensitive spell checking
 - Second-chance learning system
 - No jigsaw puzzle (focus on words)
 - Larger rewards bank for collecting
+
+**Pronunciation System:**
+- Primary: Merriam-Webster School Dictionary API (sd4)
+- Fallback: Browser's built-in Text-to-Speech
+- Free API tier: 1,000 requests/day
+- See [MERRIAM_WEBSTER_SETUP.md](MERRIAM_WEBSTER_SETUP.md) for setup instructions
 
 ### 📖 Vocabulary Practice (COMPLETE)
 
@@ -194,9 +215,11 @@ Planned features:
 - **Resume ▶️** - Continue from where you left off
 - **🔊** - Toggle sound effects
 - **← Back to Subjects** - Return to subject selection
+- **🏠 Logout** - Clear session and return to login page
 - **Enter Key** - Submit answer (Math, Spelling pages)
 - **Click Buttons** - Select answer (Science page)
 - **Next Word →** - Continue to next word (Vocabulary page)
+- **🔊 Play Word** - Replay pronunciation with definition (Spelling page)
 
 ### Scoring
 - **Correct** - Total correct answers
@@ -396,6 +419,13 @@ The app uses `sessionStorage` to remember login:
 - **Total Words**: 750
 - **Website**: www.iasp.org
 
+### Pronunciation & Definitions
+- **API**: Merriam-Webster School Dictionary API (sd4)
+- **Features**: Professional audio pronunciation + word definitions
+- **Cost**: FREE (1,000 requests/day)
+- **Documentation**: See [MERRIAM_WEBSTER_SETUP.md](MERRIAM_WEBSTER_SETUP.md)
+- **Fallback**: Browser Web Speech API (works offline)
+
 ### Science Questions
 - **Source 1**: Science Trivia for Kids
   - Website: kids.lovetoknow.com/child-education/kids-science-trivia-questions
@@ -413,13 +443,18 @@ The app uses `sessionStorage` to remember login:
 
 ## ✨ What's New
 
-### Latest Updates
+### Latest Updates (January 2026)
 - ✅ **Science Page Complete** - 80 multiple choice questions across 7 categories
 - ✅ **Vocabulary Builder Complete** - 99 words with flashcard-style learning
+- ✅ **Merriam-Webster Integration** - Professional pronunciation audio for spelling
+- ✅ **Auto-Display Definitions** - Word meanings shown during spelling practice
+- ✅ **Logout Functionality** - Secure logout returns to login screen
 - ✅ **Enhanced UI** - Beautiful animations and responsive design
 - ✅ **Smart Question Management** - No repeats until all questions used
 - ✅ **Category Badges** - Shows topic for each science question
 - ✅ **Progress Tracking** - Visual progress bars and counters
+- ✅ **Fixed Pause/Resume** - Works perfectly on all pages
+- ✅ **Layout Improvements** - No overlapping panels
 
 ### Complete Subjects (4 of 5)
 1. **Math Facts** - 12 operations, 16-piece puzzle, unlimited questions
@@ -430,12 +465,14 @@ The app uses `sessionStorage` to remember login:
 ## 📊 Application Statistics
 
 - **Total Questions/Words**: 80 science + 750 spelling + 99 vocabulary = 929+ learning items
-- **Total Code Lines**: ~3,500+ lines of HTML/CSS/JavaScript
-- **File Count**: 12 main files + 3 PDF sources
+- **Total Code Lines**: ~4,000+ lines of HTML/CSS/JavaScript
+- **File Count**: 13 main files + 3 PDF sources + 1 setup guide
 - **Emoji Rewards**: 120+ unique rewards
 - **Break Messages**: 30+ themed messages
 - **Supported Operations**: 12 math operations
 - **Science Categories**: 7 topics
+- **Vocabulary Words**: 99 with definitions
+- **API Integration**: Merriam-Webster School Dictionary (free tier)
 - **Responsive Breakpoints**: 4 screen sizes
 
 ## 📄 License
@@ -450,6 +487,9 @@ None currently! Report any issues you find.
 
 - [x] ~~Vocabulary word lists with definitions~~ ✅ COMPLETE (99 words)
 - [x] ~~Science questions~~ ✅ COMPLETE (80 multiple choice)
+- [x] ~~Merriam-Webster pronunciation~~ ✅ COMPLETE (with API integration)
+- [x] ~~Word definitions in spelling~~ ✅ COMPLETE (auto-display)
+- [x] ~~Logout functionality~~ ✅ COMPLETE
 - [ ] Geography questions with maps
 - [ ] Progress tracking across sessions (localStorage)
 - [ ] Printable certificates
@@ -458,6 +498,7 @@ None currently! Report any issues you find.
 - [ ] Multiplayer mode
 - [ ] More vocabulary words (currently 99 of 200+ available)
 - [ ] Science question images/diagrams
+- [ ] Spelling word audio caching for offline use
 
 ## 🎯 Quick Feature Comparison
 
@@ -472,7 +513,9 @@ None currently! Report any issues you find.
 | Score Tracking | ✅ | ✅ | ✅ Progress | ✅ |
 | Side Panels | ✅ | ✅ Small | ❌ Clean | ✅ |
 | Input Method | Type | Type | None | Click |
-| Special Feature | Fractions | Text-to-speech | Auto-reveal | Categories |
+| Definitions | ❌ | ✅ M-W API | ✅ Built-in | ❌ |
+| Pronunciation | ❌ | ✅ M-W Audio | ❌ | ❌ |
+| Special Feature | Fractions | M-W Dictionary | Auto-reveal | Categories |
 
 ## 💡 Tips for Best Experience
 

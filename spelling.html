@@ -55,6 +55,10 @@
         <div class="problem-area">
             <div class="problem" id="problem">Click Start to begin!</div>
             <button class="pronounce-btn" id="pronounceBtn" disabled>🔊 Play Word</button>
+            <div class="word-definition" id="wordDefinition" style="display: none;">
+                <div class="definition-label">📖 Definition:</div>
+                <div class="definition-text" id="definitionText"></div>
+            </div>
             <input type="text" class="answer-input" id="answer" placeholder="Type the word..." disabled>
             <div class="keyboard-hint">Press Enter ↵ to submit</div>
             <button class="submit-btn" id="submit" disabled>Check Spelling</button>
@@ -126,8 +130,16 @@
                     return false; // Word not found or suggestions returned
                 }
 
-                // Find pronunciation audio file
+                // Get entry data
                 const entry = data[0];
+
+                // Extract and display definition (if available)
+                if (entry.shortdef && entry.shortdef.length > 0) {
+                    const definition = entry.shortdef[0];
+                    displayDefinition(definition);
+                }
+
+                // Find pronunciation audio file
                 if (entry.hwi && entry.hwi.prs && entry.hwi.prs.length > 0) {
                     const pronunciation = entry.hwi.prs[0];
                     if (pronunciation.sound && pronunciation.sound.audio) {
@@ -161,6 +173,23 @@
             }
         }
 
+        // Display word definition
+        function displayDefinition(definition) {
+            const definitionEl = document.getElementById('wordDefinition');
+            const definitionText = document.getElementById('definitionText');
+
+            if (definition) {
+                definitionText.textContent = definition;
+                definitionEl.style.display = 'block';
+            }
+        }
+
+        // Hide definition
+        function hideDefinition() {
+            const definitionEl = document.getElementById('wordDefinition');
+            definitionEl.style.display = 'none';
+        }
+
         // Generate a spelling problem
         function generateProblem() {
             const wordList = spellingWords[difficulty];
@@ -173,9 +202,10 @@
 
             document.getElementById('answer').value = '';
             document.getElementById('feedback').textContent = '';
+            hideDefinition(); // Hide definition from previous word
             document.getElementById('answer').focus();
 
-            // Speak the word
+            // Speak the word (will also fetch and display definition if M-W API is used)
             speakWord(currentWord);
 
             // Enable pronounce button
