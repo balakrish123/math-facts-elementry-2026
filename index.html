@@ -246,10 +246,10 @@
                 <div class="subject-name">Science</div>
             </a>
 
-            <a href="index.html" class="subject-card" style="grid-column: span 2;">
+            <button class="subject-card logout-btn" style="grid-column: span 2; cursor: pointer; border: none; font-family: inherit;" onclick="handleLogout()">
                 <div class="subject-emoji">🏠</div>
                 <div class="subject-name">Logout</div>
-            </a>
+            </button>
         </div>
     </div>
 
@@ -289,6 +289,26 @@
                 }, 500);
             }
         });
+
+        // Handle logout
+        function handleLogout() {
+            // Clear session storage
+            sessionStorage.removeItem('loggedIn');
+
+            // Hide subjects screen
+            document.getElementById('subjectsScreen').classList.add('hidden');
+
+            // Show login screen
+            document.getElementById('loginScreen').classList.remove('hidden');
+
+            // Clear form fields
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            document.getElementById('error').classList.add('hidden');
+
+            // Focus on username field
+            document.getElementById('username').focus();
+        }
 
         // Check if already logged in
         if (sessionStorage.getItem('loggedIn') === 'true') {
