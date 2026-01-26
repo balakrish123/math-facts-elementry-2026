@@ -149,20 +149,6 @@
             });
         }
 
-        // Override the global resumeTimer to also enable buttons
-        const originalResumeTimer = window.resumeTimer;
-        window.resumeTimer = function() {
-            if (originalResumeTimer) originalResumeTimer();
-            toggleButtonsState(true);
-        };
-
-        // Override the global pauseTimer to also disable buttons
-        const originalPauseTimer = window.pauseTimer;
-        window.pauseTimer = function() {
-            if (originalPauseTimer) originalPauseTimer();
-            toggleButtonsState(false);
-        };
-
         // Check answer
         function checkAnswer(selectedIndex) {
             if (!gameStarted || !currentQuestion || isPaused) return;
@@ -272,6 +258,31 @@
                     }
                 });
             });
+
+            // Hook into pause/resume events to control option buttons
+            // We need to wait a bit for common.js to set up its listeners first
+            setTimeout(() => {
+                const pauseBtn = document.getElementById('pauseBtn');
+                const startBtn = document.getElementById('startBtn');
+
+                if (pauseBtn) {
+                    // Add additional listener for pause to disable option buttons
+                    pauseBtn.addEventListener('click', function() {
+                        setTimeout(() => toggleButtonsState(false), 50);
+                    });
+                }
+
+                if (startBtn) {
+                    // Add additional listener for resume to enable option buttons
+                    const originalClickHandler = function() {
+                        if (gameStarted && !isPaused) {
+                            // After resume, enable option buttons
+                            setTimeout(() => toggleButtonsState(true), 150);
+                        }
+                    };
+                    startBtn.addEventListener('click', originalClickHandler);
+                }
+            }, 100);
         });
     </script>
 </body>

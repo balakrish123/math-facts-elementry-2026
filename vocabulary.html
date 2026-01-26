@@ -5,106 +5,228 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vocabulary Practice</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- All styles now in styles.css -->
 </head>
 <body class="page-vocabulary">
     <a href="index.html" class="back-btn">← Back to Subjects</a>
 
     <button class="sound-toggle" id="soundToggle">🔊</button>
 
-    <div class="left-panel" id="leftPanel">
-        <div class="difficulty-selector-left">
-            <div class="difficulty-title">🎯 Difficulty</div>
-            <button class="difficulty-btn active" data-level="easy">Easy (Grade 1-2)</button>
-            <button class="difficulty-btn" data-level="medium">Medium (Grade 3-4)</button>
-            <button class="difficulty-btn" data-level="hard">Hard (Grade 5-6)</button>
-        </div>
-    </div>
+    <div class="container vocab-container" id="mainContainer">
+        <h1>📖 Vocabulary Builder</h1>
 
-    <div class="right-panel" id="rightPanel">
-        <div class="rewards-bank">
-            <div class="bank-title">🏦 My Rewards Bank 🏦</div>
-            <div class="rewards-container" id="rewards"></div>
-        </div>
-
-        <div class="puzzle-container">
-            <div class="puzzle-title">🧩 Jigsaw Puzzle</div>
-            <div class="puzzle-progress" id="puzzleProgress">0/16 pieces</div>
-            <div class="progress-bar-container">
-                <div class="progress-bar" id="progressBar"></div>
+        <div class="vocab-stats">
+            <div class="stat-item">
+                <div class="stat-label">Words Studied</div>
+                <div class="stat-value" id="wordsStudied">0</div>
             </div>
-            <div class="puzzle-grid" id="puzzleGrid"></div>
-            <div class="puzzle-drop-zone" id="dropZone" style="display: none;">
-                <div class="drop-zone-text">Drag piece here! 👇</div>
-            </div>
-            <div class="puzzle-complete" id="puzzleComplete" style="display: none;">🎉🏆🎉</div>
-        </div>
-    </div>
-
-    <div class="container" id="mainContainer">
-        <h1>Vocabulary Practice!</h1>
-
-        <div class="score-board">
-            <div class="score-item">
-                <div class="score-label">Correct</div>
-                <div class="score-value" id="correct">0</div>
-            </div>
-            <div class="score-item">
-                <div class="score-label">Streak</div>
-                <div class="score-value" id="streak">0</div>
-            </div>
-            <div class="score-item">
-                <div class="score-label">Total</div>
-                <div class="score-value" id="total">0</div>
+            <div class="stat-item">
+                <div class="stat-label">Total Words</div>
+                <div class="stat-value" id="totalWords">99</div>
             </div>
         </div>
 
-        <div class="timer-container">
-            <button class="control-btn" id="startBtn">Start ▶️</button>
-            <div class="timer" id="timer">45</div>
-            <button class="control-btn pause hidden" id="pauseBtn">Pause ⏸️</button>
+        <div class="vocab-card-container">
+            <div class="vocab-card" id="vocabCard">
+                <div class="vocab-start-screen" id="startScreen">
+                    <div class="vocab-icon">📚</div>
+                    <h2>Ready to Learn?</h2>
+                    <p>Click Start to begin learning new vocabulary words!</p>
+                    <button class="vocab-start-btn" id="startBtn">Start Learning ▶️</button>
+                </div>
+
+                <div class="vocab-word-screen hidden" id="wordScreen">
+                    <div class="vocab-word-type" id="wordType"></div>
+                    <div class="vocab-word" id="vocabWord"></div>
+                    <div class="vocab-hint">💡 Think about what this word means...</div>
+                    <div class="vocab-reveal-timer" id="revealTimer">Definition reveals in <span id="countdown">10</span>s</div>
+                </div>
+
+                <div class="vocab-definition-screen hidden" id="definitionScreen">
+                    <div class="vocab-word-small" id="vocabWordSmall"></div>
+                    <div class="vocab-word-type-small" id="wordTypeSmall"></div>
+                    <div class="vocab-definition" id="vocabDefinition"></div>
+                    <div class="vocab-actions">
+                        <button class="vocab-btn next-btn" id="nextBtn">Next Word →</button>
+                        <button class="vocab-btn finish-btn hidden" id="finishBtn">Finish ✓</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="problem-area">
-            <div class="coming-soon">📖 Coming Soon! 📖</div>
-            <p style="text-align: center; font-size: 1.3em; color: #666; margin-top: 20px;">
-                Vocabulary practice will be available soon.<br>
-                Features will include:<br><br>
-                ✨ Word definitions & synonyms<br>
-                ✨ Context sentences<br>
-                ✨ Multiple choice questions<br>
-                ✨ Same rewards & puzzle system
-            </p>
-            <div class="problem hidden" id="problem">Choose the correct definition...</div>
-            <input type="text" class="answer-input hidden" id="answer" placeholder="?" disabled>
-            <div class="keyboard-hint hidden">Press Enter ↵ to submit</div>
-            <button class="submit-btn hidden" id="submit" disabled>Check Answer</button>
-            <div class="feedback" id="feedback"></div>
+        <div class="vocab-progress-bar">
+            <div class="vocab-progress-fill" id="progressFill"></div>
         </div>
+        <div class="vocab-progress-text" id="progressText">0 of 99 words</div>
     </div>
 
     <script src="common.js"></script>
+    <script src="vocabulary-words.js"></script>
     <script>
         // Check login status
         checkLoginStatus();
 
-        // Vocabulary-specific variables (placeholder for future implementation)
-        let currentAnswer = '';
-        let difficulty = 'easy';
+        // Vocabulary-specific variables
+        let currentWordIndex = 0;
+        let wordsStudied = 0;
+        let countdownInterval = null;
+        let usedWords = new Set();
+        let isStudying = false;
 
-        // Placeholder functions for future implementation
-        function generateProblem() {
-            // TODO: Implement vocabulary question selection
-            // Display word and multiple choice options
+        // Get a random unused word
+        function getRandomWord() {
+            if (usedWords.size >= vocabularyWords.length) {
+                return null; // All words studied
+            }
+
+            let wordIndex;
+            do {
+                wordIndex = Math.floor(Math.random() * vocabularyWords.length);
+            } while (usedWords.has(wordIndex));
+
+            usedWords.add(wordIndex);
+            return vocabularyWords[wordIndex];
         }
 
-        function checkAnswer() {
-            // TODO: Implement answer checking
+        // Show word screen
+        function showWord() {
+            const word = getRandomWord();
+
+            if (!word) {
+                // All words completed
+                showCompletionScreen();
+                return;
+            }
+
+            // Hide all screens
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('definitionScreen').classList.add('hidden');
+
+            // Show word screen
+            document.getElementById('wordScreen').classList.remove('hidden');
+            document.getElementById('wordType').textContent = word.type;
+            document.getElementById('vocabWord').textContent = word.word;
+
+            // Start 10 second countdown
+            let countdown = 10;
+            document.getElementById('countdown').textContent = countdown;
+            document.getElementById('revealTimer').style.display = 'block';
+
+            // Play a subtle sound
+            playCorrectSound();
+
+            countdownInterval = setInterval(() => {
+                countdown--;
+                document.getElementById('countdown').textContent = countdown;
+
+                if (countdown <= 0) {
+                    clearInterval(countdownInterval);
+                    showDefinition(word);
+                }
+            }, 1000);
         }
 
-        function handleTimeout() {
-            // TODO: Implement timeout handling
+        // Show definition screen
+        function showDefinition(word) {
+            // Hide word screen
+            document.getElementById('wordScreen').classList.add('hidden');
+
+            // Show definition screen
+            document.getElementById('definitionScreen').classList.remove('hidden');
+            document.getElementById('vocabWordSmall').textContent = word.word;
+            document.getElementById('wordTypeSmall').textContent = word.type;
+            document.getElementById('vocabDefinition').textContent = word.definition;
+
+            // Update progress
+            wordsStudied++;
+            updateProgress();
+
+            // Check if this is the last word
+            if (usedWords.size >= vocabularyWords.length) {
+                document.getElementById('nextBtn').classList.add('hidden');
+                document.getElementById('finishBtn').classList.remove('hidden');
+            } else {
+                document.getElementById('nextBtn').classList.remove('hidden');
+                document.getElementById('finishBtn').classList.add('hidden');
+            }
+
+            // Play success sound
+            playCorrectSound();
         }
+
+        // Update progress display
+        function updateProgress() {
+            document.getElementById('wordsStudied').textContent = wordsStudied;
+            const progressPercent = (wordsStudied / vocabularyWords.length) * 100;
+            document.getElementById('progressFill').style.width = progressPercent + '%';
+            document.getElementById('progressText').textContent = `${wordsStudied} of ${vocabularyWords.length} words`;
+        }
+
+        // Show completion screen
+        function showCompletionScreen() {
+            document.getElementById('wordScreen').classList.add('hidden');
+            document.getElementById('definitionScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+
+            const startScreen = document.getElementById('startScreen');
+            startScreen.innerHTML = `
+                <div class="vocab-icon">🎉</div>
+                <h2>Congratulations!</h2>
+                <p>You've studied all ${vocabularyWords.length} vocabulary words!</p>
+                <button class="vocab-start-btn" onclick="resetStudy()">Study Again ▶️</button>
+            `;
+        }
+
+        // Reset study session
+        function resetStudy() {
+            usedWords.clear();
+            wordsStudied = 0;
+            updateProgress();
+
+            const startScreen = document.getElementById('startScreen');
+            startScreen.innerHTML = `
+                <div class="vocab-icon">📚</div>
+                <h2>Ready to Learn?</h2>
+                <p>Click Start to begin learning new vocabulary words!</p>
+                <button class="vocab-start-btn" id="startBtn">Start Learning ▶️</button>
+            `;
+
+            document.getElementById('startBtn').addEventListener('click', function() {
+                isStudying = true;
+                showWord();
+            });
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set total words
+            document.getElementById('totalWords').textContent = vocabularyWords.length;
+
+            // Start button
+            document.getElementById('startBtn').addEventListener('click', function() {
+                isStudying = true;
+                showWord();
+            });
+
+            // Next button
+            document.getElementById('nextBtn').addEventListener('click', function() {
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                }
+                showWord();
+            });
+
+            // Finish button
+            document.getElementById('finishBtn').addEventListener('click', function() {
+                showCompletionScreen();
+            });
+        });
+
+        // Clean up interval on page unload
+        window.addEventListener('beforeunload', function() {
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+        });
     </script>
 </body>
 </html>
