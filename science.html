@@ -66,46 +66,213 @@
         </div>
 
         <div class="problem-area">
-            <div class="coming-soon">🔬 Coming Soon! 🔬</div>
-            <p style="text-align: center; font-size: 1.3em; color: #666; margin-top: 20px;">
-                Science practice will be available soon.<br>
-                Features will include:<br><br>
-                ✨ Life Science questions<br>
-                ✨ Earth Science topics<br>
-                ✨ Physical Science concepts<br>
-                ✨ Fun experiments & facts<br>
-                ✨ Same rewards & puzzle system
-            </p>
-            <div class="problem hidden" id="problem">Answer the science question...</div>
-            <input type="text" class="answer-input hidden" id="answer" placeholder="?" disabled>
-            <div class="keyboard-hint hidden">Press Enter ↵ to submit</div>
-            <button class="submit-btn hidden" id="submit" disabled>Check Answer</button>
+            <div class="problem" id="problem">Click Start to begin!</div>
+            <div class="category-badge" id="categoryBadge"></div>
+            <div class="answer-options" id="answerOptions"></div>
+            <!-- Hidden dummy elements for common.js compatibility -->
+            <input type="text" id="answer" style="display: none;">
+            <button id="submit" style="display: none;"></button>
             <div class="feedback" id="feedback"></div>
         </div>
     </div>
 
     <script src="common.js"></script>
+    <script src="science-questions.js"></script>
     <script>
         // Check login status
         checkLoginStatus();
 
-        // Science-specific variables (placeholder for future implementation)
-        let currentAnswer = '';
+        // Science-specific variables
+        let currentQuestion = null;
+        let currentAnswer = -1;
         let difficulty = 'easy';
+        let usedQuestions = new Set();
 
-        // Placeholder functions for future implementation
+        // Generate a science problem
         function generateProblem() {
-            // TODO: Implement science question selection
-            // Display questions about life science, earth science, physical science
+            const questions = scienceQuestions[difficulty];
+
+            // Reset used questions if we've used them all
+            if (usedQuestions.size >= questions.length) {
+                usedQuestions.clear();
+            }
+
+            // Find an unused question
+            let questionIndex;
+            do {
+                questionIndex = Math.floor(Math.random() * questions.length);
+            } while (usedQuestions.has(questionIndex));
+
+            usedQuestions.add(questionIndex);
+            currentQuestion = questions[questionIndex];
+            currentAnswer = currentQuestion.correct;
+
+            // Display question
+            const problemEl = document.getElementById('problem');
+            problemEl.textContent = currentQuestion.question;
+
+            // Display category badge
+            const categoryBadge = document.getElementById('categoryBadge');
+            categoryBadge.textContent = `📚 ${currentQuestion.category}`;
+            categoryBadge.style.display = 'block';
+
+            // Clear feedback
+            document.getElementById('feedback').textContent = '';
+
+            // Display answer options as buttons
+            const optionsContainer = document.getElementById('answerOptions');
+            optionsContainer.innerHTML = '';
+
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.dataset.index = index;
+                button.disabled = isPaused; // Disable if paused
+                button.addEventListener('click', () => checkAnswer(index));
+                optionsContainer.appendChild(button);
+            });
+
+            // Start the timer only if game is running and not paused
+            if (gameStarted && !isPaused && pendingPieceIndex === null) {
+                startTimer();
+            }
         }
 
-        function checkAnswer() {
-            // TODO: Implement answer checking
+        // Enable/disable buttons when pausing/resuming
+        function toggleButtonsState(enabled) {
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(btn => {
+                if (!btn.classList.contains('correct') && !btn.classList.contains('incorrect')) {
+                    btn.disabled = !enabled;
+                }
+            });
         }
 
+        // Override the global resumeTimer to also enable buttons
+        const originalResumeTimer = window.resumeTimer;
+        window.resumeTimer = function() {
+            if (originalResumeTimer) originalResumeTimer();
+            toggleButtonsState(true);
+        };
+
+        // Override the global pauseTimer to also disable buttons
+        const originalPauseTimer = window.pauseTimer;
+        window.pauseTimer = function() {
+            if (originalPauseTimer) originalPauseTimer();
+            toggleButtonsState(false);
+        };
+
+        // Check answer
+        function checkAnswer(selectedIndex) {
+            if (!gameStarted || !currentQuestion || isPaused) return;
+
+            // Stop the timer
+            stopTimer();
+
+            const feedbackEl = document.getElementById('feedback');
+            const buttons = document.querySelectorAll('.option-btn');
+
+            // Disable all buttons
+            buttons.forEach(btn => btn.disabled = true);
+
+            // Highlight selected button
+            buttons[selectedIndex].classList.add('selected');
+
+            if (selectedIndex === currentAnswer) {
+                // Correct answer
+                total++;
+                correct++;
+                streak++;
+
+                buttons[selectedIndex].classList.add('correct');
+                feedbackEl.textContent = `🎉 Correct! Great job!`;
+                feedbackEl.className = 'feedback correct celebrating';
+
+                // Play success sound
+                playCorrectSound();
+
+                // Add reward - use center of screen
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                addReward(centerX, centerY);
+                updateScoreboard();
+
+                setTimeout(() => {
+                    if (!isPaused && gameStarted) {
+                        generateProblem();
+                    }
+                }, 1500);
+            } else {
+                // Wrong answer
+                total++;
+                streak = 0;
+
+                buttons[selectedIndex].classList.add('incorrect');
+                buttons[currentAnswer].classList.add('correct');
+
+                feedbackEl.textContent = `❌ Incorrect. The correct answer was: ${currentQuestion.options[currentAnswer]}`;
+                feedbackEl.className = 'feedback incorrect';
+
+                // Play wrong sound
+                playWrongSound();
+
+                updateScoreboard();
+
+                setTimeout(() => {
+                    if (!isPaused && gameStarted) {
+                        generateProblem();
+                    }
+                }, 2500);
+            }
+        }
+
+        // Handle timeout
         function handleTimeout() {
-            // TODO: Implement timeout handling
+            if (!gameStarted || isPaused || !currentQuestion) return;
+
+            total++;
+            streak = 0;
+
+            const feedbackEl = document.getElementById('feedback');
+            const buttons = document.querySelectorAll('.option-btn');
+
+            // Disable all buttons
+            buttons.forEach(btn => btn.disabled = true);
+
+            // Highlight correct answer
+            buttons[currentAnswer].classList.add('correct');
+
+            feedbackEl.textContent = `⏱️ Time's up! The correct answer was: ${currentQuestion.options[currentAnswer]}`;
+            feedbackEl.className = 'feedback incorrect';
+            playWrongSound();
+
+            updateScoreboard();
+
+            setTimeout(() => {
+                if (!isPaused) {
+                    generateProblem();
+                }
+            }, 3000);
         }
+
+        // Setup science-specific listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Difficulty buttons
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    difficulty = this.dataset.level;
+                    usedQuestions.clear(); // Reset used questions when changing difficulty
+
+                    if (gameStarted && !isPaused) {
+                        stopTimer();
+                        generateProblem();
+                    }
+                });
+            });
+        });
     </script>
 </body>
 </html>
