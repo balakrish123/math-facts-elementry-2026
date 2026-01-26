@@ -322,17 +322,44 @@
             }, 2000);
         }
 
-        // Operation buttons
-        document.querySelectorAll('.operation-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('.operation-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                operation = this.dataset.op;
+        // Setup math-specific listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Submit button
+            document.getElementById('submit').addEventListener('click', checkAnswer);
 
-                if (gameStarted && !isPaused) {
-                    stopTimer();
-                    generateProblem();
+            // Enter key to submit
+            document.getElementById('answer').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkAnswer();
                 }
+            });
+
+            // Difficulty buttons
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    difficulty = this.dataset.level;
+
+                    if (gameStarted && !isPaused) {
+                        stopTimer();
+                        generateProblem();
+                    }
+                });
+            });
+
+            // Operation buttons
+            document.querySelectorAll('.operation-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.operation-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    operation = this.dataset.op;
+
+                    if (gameStarted && !isPaused) {
+                        stopTimer();
+                        generateProblem();
+                    }
+                });
             });
         });
     </script>
