@@ -74,13 +74,91 @@
         let currentWord = '';
         let isRetryAttempt = false;
 
-        // Text-to-speech function
-        function speakWord(word) {
+        // ========================================
+        // MERRIAM-WEBSTER API CONFIGURATION
+        // ========================================
+        // Using School Dictionary 4th Edition (sd4) - Perfect for elementary students!
+        // Sign up at https://dictionaryapi.com/register/index
+        // Get your FREE School Dictionary API key (sd4 or sd2)
+        const MERRIAM_WEBSTER_API_KEY = '0f8b99b7-ddaf-4e21-8d28-ed1694036c81';
+
+        // Text-to-speech function with Merriam-Webster API support
+        async function speakWord(word) {
+            // Try Merriam-Webster API first (if API key is configured)
+            if (MERRIAM_WEBSTER_API_KEY && MERRIAM_WEBSTER_API_KEY !== 'YOUR_API_KEY_HERE') {
+                const audioPlayed = await playMerriamWebsterAudio(word);
+                if (audioPlayed) {
+                    return; // Successfully played M-W audio
+                }
+            }
+
+            // Fallback to browser's built-in text-to-speech
             const utterance = new SpeechSynthesisUtterance(word);
             utterance.rate = 0.8; // Slower for kids
             utterance.pitch = 1.0;
             utterance.volume = 1.0;
+
+            // Try to use US English voice if available
+            const voices = speechSynthesis.getVoices();
+            const usVoice = voices.find(v => v.lang === 'en-US' && v.name.includes('US'));
+            if (usVoice) {
+                utterance.voice = usVoice;
+            }
+
             speechSynthesis.speak(utterance);
+        }
+
+        // Fetch and play audio from Merriam-Webster API
+        async function playMerriamWebsterAudio(word) {
+            try {
+                // Use sd4 (School Dictionary 4th Edition) endpoint
+                const url = `https://www.dictionaryapi.com/api/v3/references/sd4/json/${word.toLowerCase()}?key=${MERRIAM_WEBSTER_API_KEY}`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    return false; // API call failed
+                }
+
+                const data = await response.json();
+
+                // Check if we got valid dictionary data
+                if (!Array.isArray(data) || data.length === 0 || typeof data[0] === 'string') {
+                    return false; // Word not found or suggestions returned
+                }
+
+                // Find pronunciation audio file
+                const entry = data[0];
+                if (entry.hwi && entry.hwi.prs && entry.hwi.prs.length > 0) {
+                    const pronunciation = entry.hwi.prs[0];
+                    if (pronunciation.sound && pronunciation.sound.audio) {
+                        const audioFile = pronunciation.sound.audio;
+
+                        // Build audio URL based on M-W's subdirectory structure
+                        let subdirectory = audioFile.charAt(0);
+                        if (audioFile.startsWith('bix')) {
+                            subdirectory = 'bix';
+                        } else if (audioFile.startsWith('gg')) {
+                            subdirectory = 'gg';
+                        } else if (!isNaN(audioFile.charAt(0))) {
+                            subdirectory = 'number';
+                        }
+
+                        const audioUrl = `https://media.merriam-webster.com/audio/prons/en/us/mp3/${subdirectory}/${audioFile}.mp3`;
+
+                        // Play the audio
+                        const audio = new Audio(audioUrl);
+                        console.log('🎵 Playing Merriam-Webster audio for:', word);
+
+                        await audio.play();
+                        return true; // Successfully played
+                    }
+                }
+
+                return false; // No audio found
+            } catch (error) {
+                console.log('M-W API unavailable, using fallback:', error.message);
+                return false; // Error occurred, use fallback
+            }
         }
 
         // Generate a spelling problem
