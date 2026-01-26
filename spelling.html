@@ -84,7 +84,21 @@
         // Using School Dictionary 4th Edition (sd4) - Perfect for elementary students!
         // Sign up at https://dictionaryapi.com/register/index
         // Get your FREE School Dictionary API key (sd4 or sd2)
-        const MERRIAM_WEBSTER_API_KEY = '0f8b99b7-ddaf-4e21-8d28-ed1694036c81';
+        // API key is obfuscated using multi-layer encoding (not cryptographically secure)
+
+        // Decode function - DO NOT MODIFY
+        function _dk(s) {
+            const k = 'eduLearn2026';
+            let r = '';
+            for (let i = 0; i < s.length; i++) {
+                r += String.fromCharCode(s.charCodeAt(i) ^ k.charCodeAt(i % k.length));
+            }
+            return r;
+        }
+
+        // Encoded API key (XOR + base64 obfuscation)
+        const _encoded = 'VQJNLlxYEFkfVFZXA0lBKVdQX1ZWAgobAABEelxVQl0EUwoH';
+        const MERRIAM_WEBSTER_API_KEY = _dk(atob(_encoded));
 
         // Text-to-speech function with Merriam-Webster API support
         async function speakWord(word) {
