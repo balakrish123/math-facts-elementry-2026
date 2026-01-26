@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Facts Practice</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- All styles now in styles.css -->
+</head>
+<body class="page-math">
+    <a href="index.html" class="back-btn">← Back to Subjects</a>
+
+    <button class="sound-toggle" id="soundToggle">🔊</button>
+
+    <div class="left-panel" id="leftPanel">
+        <div class="operations-container">
+            <div class="operations-title">📐 Operations</div>
+            <div class="operations" id="operations">
+                <button class="operation-btn active" data-op="add">+ Addition</button>
+                <button class="operation-btn" data-op="subtract">- Subtraction</button>
+                <button class="operation-btn" data-op="multiply">× Multiplication</button>
+                <button class="operation-btn" data-op="divide">÷ Division</button>
+                <button class="operation-btn" data-op="sqrt">√ Square Root</button>
+                <button class="operation-btn" data-op="cbrt">∛ Cube Root</button>
+                <button class="operation-btn" data-op="exponent">^ Exponents</button>
+                <button class="operation-btn" data-op="fraction-add">⅟ Add Fractions</button>
+                <button class="operation-btn" data-op="find-denominator">Find Denominator</button>
+                <button class="operation-btn" data-op="find-numerator">Find Numerator</button>
+                <button class="operation-btn" data-op="reduce-fraction">Reduce Fraction</button>
+                <button class="operation-btn" data-op="equal-fraction">Equal Fractions</button>
+            </div>
+        </div>
+
+        <div class="difficulty-selector-left">
+            <div class="difficulty-title">🎯 Difficulty</div>
+            <button class="difficulty-btn active" data-level="easy">Easy (0-20)</button>
+            <button class="difficulty-btn" data-level="medium">Medium (0-40)</button>
+            <button class="difficulty-btn" data-level="hard">Hard (0-100)</button>
+        </div>
+    </div>
+
+    <div class="right-panel" id="rightPanel">
+        <div class="rewards-bank">
+            <div class="bank-title">🏦 My Rewards Bank 🏦</div>
+            <div class="rewards-container" id="rewards"></div>
+        </div>
+
+        <div class="puzzle-container">
+            <div class="puzzle-title">🧩 Jigsaw Puzzle</div>
+            <div class="puzzle-progress" id="puzzleProgress">0/16 pieces</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="puzzle-grid" id="puzzleGrid"></div>
+            <div class="puzzle-drop-zone" id="dropZone" style="display: none;">
+                <div class="drop-zone-text">Drag piece here! 👇</div>
+            </div>
+            <div class="puzzle-complete" id="puzzleComplete" style="display: none;">🎉🏆🎉</div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <h1>Math Facts Practice!</h1>
+
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-label">Correct</div>
+                <div class="score-value" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Streak</div>
+                <div class="score-value" id="streak">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Total</div>
+                <div class="score-value" id="total">0</div>
+            </div>
+        </div>
+
+        <div class="timer-container">
+            <button class="control-btn" id="startBtn">Start ▶️</button>
+            <div class="timer" id="timer">45</div>
+            <button class="control-btn pause hidden" id="pauseBtn">Pause ⏸️</button>
+        </div>
+
+        <div class="problem-area">
+            <div class="problem" id="problem">Select operation and click Start!</div>
+            <input type="number" class="answer-input" id="answer" placeholder="?" disabled>
+            <div class="keyboard-hint">Press Enter ↵ to submit</div>
+            <button class="submit-btn" id="submit" disabled>Check Answer</button>
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        // Check login status
+        checkLoginStatus();
+
+        // Math-specific variables
+        let currentAnswer = 0;
+        let difficulty = 'easy';
+        let operation = 'add';
+
+        const difficultyRanges = {
+            easy: { min: 0, max: 20 },
+            medium: { min: 0, max: 40 },
+            hard: { min: 0, max: 100 }
+        };
+
+        // Generate math problem
+        function generateProblem() {
+            const range = difficultyRanges[difficulty];
+            let num1 = getRandomNumber(range.min, range.max);
+            let num2 = getRandomNumber(range.min, range.max);
+            let problemText = '';
+
+            switch(operation) {
+                case 'add':
+                    currentAnswer = num1 + num2;
+                    problemText = `${num1} + ${num2} = ?`;
+                    break;
+                case 'subtract':
+                    if (num1 < num2) [num1, num2] = [num2, num1];
+                    currentAnswer = num1 - num2;
+                    problemText = `${num1} - ${num2} = ?`;
+                    break;
+                case 'multiply':
+                    num1 = getRandomNumber(range.min, Math.min(12, range.max));
+                    num2 = getRandomNumber(range.min, Math.min(12, range.max));
+                    currentAnswer = num1 * num2;
+                    problemText = `${num1} × ${num2} = ?`;
+                    break;
+                case 'divide':
+                    num2 = getRandomNumber(1, Math.min(12, range.max));
+                    const quotient = getRandomNumber(1, Math.min(12, range.max));
+                    num1 = num2 * quotient;
+                    currentAnswer = quotient;
+                    problemText = `${num1} ÷ ${num2} = ?`;
+                    break;
+                case 'sqrt':
+                    let maxRoot;
+                    if (difficulty === 'easy') {
+                        maxRoot = 10;
+                    } else if (difficulty === 'medium') {
+                        maxRoot = 15;
+                    } else {
+                        maxRoot = 20;
+                    }
+                    currentAnswer = getRandomNumber(1, maxRoot);
+                    const square = currentAnswer * currentAnswer;
+                    problemText = `√${square} = ?`;
+                    break;
+                case 'cbrt':
+                    let maxCubeRoot;
+                    if (difficulty === 'easy') {
+                        maxCubeRoot = 5;
+                    } else if (difficulty === 'medium') {
+                        maxCubeRoot = 8;
+                    } else {
+                        maxCubeRoot = 10;
+                    }
+                    currentAnswer = getRandomNumber(1, maxCubeRoot);
+                    const cube = currentAnswer * currentAnswer * currentAnswer;
+                    problemText = `∛${cube} = ?`;
+                    break;
+                case 'exponent':
+                    let base, exponent;
+                    if (difficulty === 'easy') {
+                        base = getRandomNumber(2, 5);
+                        exponent = 2;
+                    } else if (difficulty === 'medium') {
+                        base = getRandomNumber(2, 8);
+                        exponent = getRandomNumber(2, 3);
+                    } else {
+                        base = getRandomNumber(2, 10);
+                        exponent = getRandomNumber(2, 4);
+                    }
+                    currentAnswer = Math.pow(base, exponent);
+                    problemText = `${base}<sup>${exponent}</sup> = ?`;
+                    break;
+                case 'fraction-add':
+                    const denom = getRandomNumber(2, 8);
+                    const num1f = getRandomNumber(1, denom - 1);
+                    const num2f = getRandomNumber(1, denom - num1f);
+                    currentAnswer = num1f + num2f;
+                    problemText = `<sup>${num1f}</sup>/<sub>${denom}</sub> + <sup>${num2f}</sup>/<sub>${denom}</sub> = <sup>?</sup>/<sub>${denom}</sub>`;
+                    break;
+                case 'find-denominator':
+                    const origNum = getRandomNumber(1, 6);
+                    const origDen = getRandomNumber(2, 8);
+                    const multiplier = getRandomNumber(2, 5);
+                    currentAnswer = origDen * multiplier;
+                    const newNum = origNum * multiplier;
+                    problemText = `<sup>${origNum}</sup>/<sub>${origDen}</sub> = <sup>${newNum}</sup>/<sub>?</sub>`;
+                    break;
+                case 'find-numerator':
+                    const origNum2 = getRandomNumber(1, 6);
+                    const origDen2 = getRandomNumber(2, 8);
+                    const mult2 = getRandomNumber(2, 5);
+                    currentAnswer = origNum2 * mult2;
+                    const newDen = origDen2 * mult2;
+                    problemText = `<sup>${origNum2}</sup>/<sub>${origDen2}</sub> = <sup>?</sup>/<sub>${newDen}</sub>`;
+                    break;
+                case 'reduce-fraction':
+                    const gcd = getRandomNumber(2, 6);
+                    const simplNum = getRandomNumber(1, 5);
+                    const simplDen = getRandomNumber(simplNum + 1, 8);
+                    const reducNum = simplNum * gcd;
+                    const reducDen = simplDen * gcd;
+                    currentAnswer = simplNum;
+                    problemText = `Reduce <sup>${reducNum}</sup>/<sub>${reducDen}</sub> = <sup>?</sup>/<sub>${simplDen}</sub>`;
+                    break;
+                case 'equal-fraction':
+                    const isEqual = Math.random() > 0.5;
+                    if (isEqual) {
+                        const n1 = getRandomNumber(1, 5);
+                        const d1 = getRandomNumber(2, 8);
+                        const m = getRandomNumber(2, 4);
+                        problemText = `<sup>${n1}</sup>/<sub>${d1}</sub> = <sup>${n1 * m}</sup>/<sub>${d1 * m}</sub>? (1=Yes, 0=No)`;
+                        currentAnswer = 1;
+                    } else {
+                        const n1eq = getRandomNumber(1, 5);
+                        const d1eq = getRandomNumber(2, 8);
+                        const n2eq = getRandomNumber(1, 5);
+                        const d2eq = getRandomNumber(2, 8);
+                        if (n1eq * d2eq !== n2eq * d1eq) {
+                            problemText = `<sup>${n1eq}</sup>/<sub>${d1eq}</sub> = <sup>${n2eq}</sup>/<sub>${d2eq}</sub>? (1=Yes, 0=No)`;
+                            currentAnswer = 0;
+                        } else {
+                            problemText = `<sup>${n1eq}</sup>/<sub>${d1eq}</sub> = <sup>${n2eq}</sup>/<sub>${d2eq}</sub>? (1=Yes, 0=No)`;
+                            currentAnswer = 1;
+                        }
+                    }
+                    break;
+            }
+
+            const problemEl = document.getElementById('problem');
+            const fractionOps = ['exponent', 'fraction-add', 'find-denominator', 'find-numerator', 'reduce-fraction', 'equal-fraction'];
+            if (fractionOps.includes(operation)) {
+                problemEl.innerHTML = problemText;
+            } else {
+                problemEl.textContent = problemText;
+            }
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('answer').focus();
+
+            if (gameStarted && !isPaused && pendingPieceIndex === null) {
+                startTimer();
+            }
+        }
+
+        // Check answer
+        function checkAnswer() {
+            if (!gameStarted) return;
+
+            const userAnswer = parseInt(document.getElementById('answer').value);
+            const feedbackEl = document.getElementById('feedback');
+
+            if (isNaN(userAnswer)) {
+                feedbackEl.textContent = 'Please enter a number!';
+                feedbackEl.className = 'feedback incorrect';
+                return;
+            }
+
+            stopTimer();
+            total++;
+
+            if (userAnswer === currentAnswer) {
+                correct++;
+                streak++;
+                feedbackEl.textContent = '🎉 Correct! Great job!';
+                feedbackEl.className = 'feedback correct celebrating';
+
+                playCorrectSound();
+
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                addReward(centerX, centerY);
+
+                setTimeout(() => {
+                    if (!isPaused) {
+                        generateProblem();
+                    }
+                }, 1000);
+            } else {
+                streak = 0;
+                feedbackEl.textContent = `Not quite. The answer is ${currentAnswer}`;
+                feedbackEl.className = 'feedback incorrect';
+
+                playWrongSound();
+
+                setTimeout(() => {
+                    if (!isPaused) {
+                        generateProblem();
+                    }
+                }, 2000);
+            }
+
+            updateScoreboard();
+        }
+
+        // Handle timeout
+        function handleTimeout() {
+            if (!gameStarted || isPaused) return;
+
+            const feedbackEl = document.getElementById('feedback');
+            total++;
+            streak = 0;
+
+            feedbackEl.textContent = `⏱️ Time's up! The answer was ${currentAnswer}`;
+            feedbackEl.className = 'feedback incorrect';
+            playWrongSound();
+
+            updateScoreboard();
+
+            setTimeout(() => {
+                if (!isPaused) {
+                    generateProblem();
+                }
+            }, 2000);
+        }
+
+        // Operation buttons
+        document.querySelectorAll('.operation-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.operation-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                operation = this.dataset.op;
+
+                if (gameStarted && !isPaused) {
+                    stopTimer();
+                    generateProblem();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

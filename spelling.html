@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spelling Practice</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- All styles now in styles.css -->
+</head>
+<body class="page-spelling">
+    <a href="index.html" class="back-btn">← Back to Subjects</a>
+
+    <button class="sound-toggle" id="soundToggle">🔊</button>
+
+    <div class="left-panel" id="leftPanel">
+        <div class="difficulty-selector-left">
+            <div class="difficulty-title">🎯 Word Length</div>
+            <button class="difficulty-btn active" data-level="easy">Easy (4-7 letters)</button>
+            <button class="difficulty-btn" data-level="medium">Medium (8-12 letters)</button>
+            <button class="difficulty-btn" data-level="hard">Hard (13+ letters)</button>
+        </div>
+    </div>
+
+    <div class="right-panel" id="rightPanel">
+        <div class="rewards-bank">
+            <div class="bank-title">🏦 My Rewards Bank 🏦</div>
+            <div class="rewards-container" id="rewards"></div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <h1>Spelling Practice!</h1>
+
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-label">Correct</div>
+                <div class="score-value" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Streak</div>
+                <div class="score-value" id="streak">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Total</div>
+                <div class="score-value" id="total">0</div>
+            </div>
+        </div>
+
+        <div class="timer-container">
+            <button class="control-btn" id="startBtn">Start ▶️</button>
+            <div class="timer" id="timer">45</div>
+            <button class="control-btn pause hidden" id="pauseBtn">Pause ⏸️</button>
+        </div>
+
+        <div class="problem-area">
+            <div class="problem" id="problem">Click Start to begin!</div>
+            <button class="pronounce-btn" id="pronounceBtn" disabled>🔊 Play Word</button>
+            <input type="text" class="answer-input" id="answer" placeholder="Type the word..." disabled>
+            <div class="keyboard-hint">Press Enter ↵ to submit</div>
+            <button class="submit-btn" id="submit" disabled>Check Spelling</button>
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="spelling-words.js"></script>
+    <script>
+        // Check login status
+        checkLoginStatus();
+
+        // Spelling-specific variables
+        let currentAnswer = '';
+        let difficulty = 'easy';
+        let currentWord = '';
+        let isRetryAttempt = false;
+
+        // Text-to-speech function
+        function speakWord(word) {
+            const utterance = new SpeechSynthesisUtterance(word);
+            utterance.rate = 0.8; // Slower for kids
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            speechSynthesis.speak(utterance);
+        }
+
+        // Generate a spelling problem
+        function generateProblem() {
+            const wordList = spellingWords[difficulty];
+            currentWord = wordList[Math.floor(Math.random() * wordList.length)];
+            currentAnswer = currentWord.toLowerCase();
+            isRetryAttempt = false; // Reset retry flag for new word
+
+            const problemEl = document.getElementById('problem');
+            problemEl.textContent = '🔊 Listen and spell the word...';
+
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('answer').focus();
+
+            // Speak the word
+            speakWord(currentWord);
+
+            // Enable pronounce button
+            document.getElementById('pronounceBtn').disabled = false;
+
+            // Start the timer only if game is running and not paused
+            if (gameStarted && !isPaused && pendingPieceIndex === null) {
+                startTimer();
+            }
+        }
+
+        // Check spelling
+        function checkAnswer() {
+            if (!gameStarted) return;
+
+            const userAnswer = document.getElementById('answer').value.trim().toLowerCase();
+            const feedbackEl = document.getElementById('feedback');
+
+            if (!userAnswer) {
+                feedbackEl.textContent = 'Please type a word!';
+                feedbackEl.className = 'feedback incorrect';
+                return;
+            }
+
+            // Stop the timer
+            stopTimer();
+
+            if (userAnswer === currentAnswer) {
+                // Correct answer
+                total++;
+                correct++;
+                streak++;
+
+                if (isRetryAttempt) {
+                    feedbackEl.textContent = `🎉 Great! You got it right on your second try!`;
+                } else {
+                    feedbackEl.textContent = `🎉 Perfect! "${currentWord}" is spelled right!`;
+                }
+                feedbackEl.className = 'feedback correct celebrating';
+
+                // Play success sound
+                playCorrectSound();
+
+                // Add reward using common utility function
+                addRewardSimple(window.innerWidth / 2, window.innerHeight / 2);
+                updateScoreboard();
+
+                setTimeout(() => {
+                    if (!isPaused) {
+                        generateProblem();
+                    }
+                }, 1500);
+            } else {
+                // Wrong answer
+                if (!isRetryAttempt) {
+                    // First mistake - give them another try
+                    isRetryAttempt = true;
+                    feedbackEl.textContent = `❌ Try again! Listen carefully... (Correct: "${currentWord}")`;
+                    feedbackEl.className = 'feedback incorrect';
+
+                    // Play wrong sound
+                    playWrongSound();
+
+                    // Clear the input and let them try again
+                    document.getElementById('answer').value = '';
+
+                    // Speak the correct word again
+                    setTimeout(() => speakWord(currentWord), 1000);
+
+                    // Restart timer for retry
+                    setTimeout(() => {
+                        if (!isPaused && gameStarted) {
+                            startTimer();
+                        }
+                    }, 1500);
+                } else {
+                    // Second mistake - count it and move on
+                    total++;
+                    streak = 0;
+                    feedbackEl.textContent = `❌ The correct spelling was "${currentWord}". Moving to next word...`;
+                    feedbackEl.className = 'feedback incorrect';
+
+                    // Play wrong sound
+                    playWrongSound();
+
+                    // Speak the word one more time
+                    setTimeout(() => speakWord(currentWord), 800);
+
+                    updateScoreboard();
+
+                    setTimeout(() => {
+                        if (!isPaused) {
+                            generateProblem();
+                        }
+                    }, 3000);
+                }
+            }
+        }
+
+        // Handle timeout
+        function handleTimeout() {
+            if (!gameStarted || isPaused) return;
+
+            const feedbackEl = document.getElementById('feedback');
+
+            if (!isRetryAttempt) {
+                // First timeout - give them another try
+                isRetryAttempt = true;
+                feedbackEl.textContent = `⏱️ Time's up! Try again! The word is "${currentWord}"`;
+                feedbackEl.className = 'feedback incorrect';
+                playWrongSound();
+
+                // Clear input and speak word
+                document.getElementById('answer').value = '';
+                speakWord(currentWord);
+
+                // Restart timer for retry
+                setTimeout(() => {
+                    if (!isPaused && gameStarted) {
+                        startTimer();
+                    }
+                }, 2000);
+            } else {
+                // Second timeout - count it and move on
+                total++;
+                streak = 0;
+
+                feedbackEl.textContent = `⏱️ Time's up again! The word was "${currentWord}". Moving on...`;
+                feedbackEl.className = 'feedback incorrect';
+                playWrongSound();
+
+                // Speak the word
+                speakWord(currentWord);
+
+                updateScoreboard();
+
+                setTimeout(() => {
+                    if (!isPaused) {
+                        generateProblem();
+                    }
+                }, 3000);
+            }
+        }
+
+        // Setup spelling-specific listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Submit button
+            document.getElementById('submit').addEventListener('click', checkAnswer);
+
+            // Enter key to submit
+            document.getElementById('answer').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+
+            // Pronounce button
+            document.getElementById('pronounceBtn').addEventListener('click', function() {
+                if (currentWord) {
+                    speakWord(currentWord);
+                }
+            });
+
+            // Difficulty buttons
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    difficulty = this.dataset.level;
+
+                    if (gameStarted && !isPaused) {
+                        stopTimer();
+                        generateProblem();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

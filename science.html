@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Practice</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- All styles now in styles.css -->
+</head>
+<body class="page-science">
+    <a href="index.html" class="back-btn">← Back to Subjects</a>
+
+    <button class="sound-toggle" id="soundToggle">🔊</button>
+
+    <div class="left-panel" id="leftPanel">
+        <div class="difficulty-selector-left">
+            <div class="difficulty-title">🎯 Difficulty</div>
+            <button class="difficulty-btn active" data-level="easy">Easy (Grade 1-2)</button>
+            <button class="difficulty-btn" data-level="medium">Medium (Grade 3-4)</button>
+            <button class="difficulty-btn" data-level="hard">Hard (Grade 5-6)</button>
+        </div>
+    </div>
+
+    <div class="right-panel" id="rightPanel">
+        <div class="rewards-bank">
+            <div class="bank-title">🏦 My Rewards Bank 🏦</div>
+            <div class="rewards-container" id="rewards"></div>
+        </div>
+
+        <div class="puzzle-container">
+            <div class="puzzle-title">🧩 Jigsaw Puzzle</div>
+            <div class="puzzle-progress" id="puzzleProgress">0/16 pieces</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="puzzle-grid" id="puzzleGrid"></div>
+            <div class="puzzle-drop-zone" id="dropZone" style="display: none;">
+                <div class="drop-zone-text">Drag piece here! 👇</div>
+            </div>
+            <div class="puzzle-complete" id="puzzleComplete" style="display: none;">🎉🏆🎉</div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <h1>Science Practice!</h1>
+
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-label">Correct</div>
+                <div class="score-value" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Streak</div>
+                <div class="score-value" id="streak">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Total</div>
+                <div class="score-value" id="total">0</div>
+            </div>
+        </div>
+
+        <div class="timer-container">
+            <button class="control-btn" id="startBtn">Start ▶️</button>
+            <div class="timer" id="timer">45</div>
+            <button class="control-btn pause hidden" id="pauseBtn">Pause ⏸️</button>
+        </div>
+
+        <div class="problem-area">
+            <div class="coming-soon">🔬 Coming Soon! 🔬</div>
+            <p style="text-align: center; font-size: 1.3em; color: #666; margin-top: 20px;">
+                Science practice will be available soon.<br>
+                Features will include:<br><br>
+                ✨ Life Science questions<br>
+                ✨ Earth Science topics<br>
+                ✨ Physical Science concepts<br>
+                ✨ Fun experiments & facts<br>
+                ✨ Same rewards & puzzle system
+            </p>
+            <div class="problem hidden" id="problem">Answer the science question...</div>
+            <input type="text" class="answer-input hidden" id="answer" placeholder="?" disabled>
+            <div class="keyboard-hint hidden">Press Enter ↵ to submit</div>
+            <button class="submit-btn hidden" id="submit" disabled>Check Answer</button>
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        // Check login status
+        checkLoginStatus();
+
+        // Science-specific variables (placeholder for future implementation)
+        let currentAnswer = '';
+        let difficulty = 'easy';
+
+        // Placeholder functions for future implementation
+        function generateProblem() {
+            // TODO: Implement science question selection
+            // Display questions about life science, earth science, physical science
+        }
+
+        function checkAnswer() {
+            // TODO: Implement answer checking
+        }
+
+        function handleTimeout() {
+            // TODO: Implement timeout handling
+        }
+    </script>
+</body>
+</html>
