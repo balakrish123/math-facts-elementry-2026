@@ -13,11 +13,17 @@
     <button class="sound-toggle" id="soundToggle">🔊</button>
 
     <div class="left-panel" id="leftPanel">
+        <div class="difficulty-selector-left" style="margin-bottom: 20px;">
+            <div class="difficulty-title">📚 Mode</div>
+            <button class="difficulty-btn active" data-mode="general">🌍 General Geography</button>
+            <button class="difficulty-btn" data-mode="states">🇺🇸 States & Capitals</button>
+        </div>
+
         <div class="difficulty-selector-left">
             <div class="difficulty-title">🎯 Difficulty</div>
-            <button class="difficulty-btn active" data-level="easy">Easy (Local)</button>
-            <button class="difficulty-btn" data-level="medium">Medium (National)</button>
-            <button class="difficulty-btn" data-level="hard">Hard (World)</button>
+            <button class="difficulty-btn active" data-level="easy">Easy</button>
+            <button class="difficulty-btn" data-level="medium">Medium</button>
+            <button class="difficulty-btn" data-level="hard">Hard</button>
         </div>
     </div>
 
@@ -66,46 +72,327 @@
         </div>
 
         <div class="problem-area">
-            <div class="coming-soon">🌍 Coming Soon! 🌍</div>
-            <p style="text-align: center; font-size: 1.3em; color: #666; margin-top: 20px;">
-                Geography practice will be available soon.<br>
-                Features will include:<br><br>
-                ✨ Countries & capitals<br>
-                ✨ States & cities<br>
-                ✨ Continents & oceans<br>
-                ✨ Interactive maps<br>
-                ✨ Same rewards & puzzle system
-            </p>
-            <div class="problem hidden" id="problem">What is the capital of...?</div>
-            <input type="text" class="answer-input hidden" id="answer" placeholder="?" disabled>
-            <div class="keyboard-hint hidden">Press Enter ↵ to submit</div>
-            <button class="submit-btn hidden" id="submit" disabled>Check Answer</button>
+            <div class="problem" id="problem">Click Start to begin!</div>
+            <div class="category-badge" id="categoryBadge"></div>
+            <div class="answer-options" id="answerOptions"></div>
+            <!-- Hidden dummy elements for common.js compatibility -->
+            <input type="text" id="answer" style="display: none;">
+            <button id="submit" style="display: none;"></button>
             <div class="feedback" id="feedback"></div>
         </div>
     </div>
 
     <script src="common.js"></script>
+    <script src="geography-questions.js"></script>
+    <script src="states-capitals-data.js"></script>
     <script>
         // Check login status
         checkLoginStatus();
 
-        // Geography-specific variables (placeholder for future implementation)
-        let currentAnswer = '';
+        // Geography-specific variables
+        let currentQuestion = null;
+        let currentAnswer = -1;
         let difficulty = 'easy';
+        let mode = 'general'; // 'general' or 'states'
+        let usedQuestions = new Set();
+        let usedStates = new Set();
 
-        // Placeholder functions for future implementation
+        // Generate a geography problem
         function generateProblem() {
-            // TODO: Implement geography question selection
-            // Display questions about countries, capitals, states, etc.
+            if (mode === 'general') {
+                generateGeneralGeographyQuestion();
+            } else if (mode === 'states') {
+                generateStatesCapitalsQuestion();
+            }
         }
 
-        function checkAnswer() {
-            // TODO: Implement answer checking
+        // Generate general geography question
+        function generateGeneralGeographyQuestion() {
+            const questions = geographyQuestions[difficulty];
+
+            // Reset used questions if we've used them all
+            if (usedQuestions.size >= questions.length) {
+                usedQuestions.clear();
+            }
+
+            // Find an unused question
+            let questionIndex;
+            do {
+                questionIndex = Math.floor(Math.random() * questions.length);
+            } while (usedQuestions.has(questionIndex));
+
+            usedQuestions.add(questionIndex);
+            currentQuestion = questions[questionIndex];
+            currentAnswer = currentQuestion.correct;
+
+            // Display question
+            const problemEl = document.getElementById('problem');
+            problemEl.textContent = currentQuestion.question;
+
+            // Display category badge
+            const categoryBadge = document.getElementById('categoryBadge');
+            categoryBadge.textContent = `🌍 ${currentQuestion.category}`;
+            categoryBadge.style.display = 'block';
+
+            // Clear feedback
+            document.getElementById('feedback').textContent = '';
+
+            // Display answer options as buttons
+            const optionsContainer = document.getElementById('answerOptions');
+            optionsContainer.innerHTML = '';
+
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.dataset.index = index;
+                button.disabled = isPaused;
+                button.addEventListener('click', () => checkAnswer(index));
+                optionsContainer.appendChild(button);
+            });
+
+            // Start the timer
+            if (gameStarted && !isPaused && pendingPieceIndex === null) {
+                startTimer();
+            }
         }
 
+        // Generate US States & Capitals question
+        function generateStatesCapitalsQuestion() {
+            const statesList = statesCapitals[difficulty] || statesCapitals.all;
+
+            // Reset used states if we've used them all
+            if (usedStates.size >= statesList.length) {
+                usedStates.clear();
+            }
+
+            // Find an unused state
+            let stateIndex;
+            do {
+                stateIndex = Math.floor(Math.random() * statesList.length);
+            } while (usedStates.has(stateIndex));
+
+            usedStates.add(stateIndex);
+            const stateData = statesList[stateIndex];
+
+            // Randomly decide: ask for capital or ask for state
+            const askForCapital = Math.random() > 0.5;
+
+            if (askForCapital) {
+                // Ask: "What is the capital of [State]?"
+                const problemEl = document.getElementById('problem');
+                problemEl.textContent = `What is the capital of ${stateData.state}?`;
+
+                // Generate options with correct capital
+                const options = generateCapitalOptions(stateData.capital, statesCapitals.all);
+                currentAnswer = options.indexOf(stateData.capital);
+                currentQuestion = { options: options };
+
+                // Display category badge
+                const categoryBadge = document.getElementById('categoryBadge');
+                categoryBadge.textContent = `🇺🇸 ${stateData.region} Region`;
+                categoryBadge.style.display = 'block';
+            } else {
+                // Ask: "[Capital] is the capital of which state?"
+                const problemEl = document.getElementById('problem');
+                problemEl.textContent = `${stateData.capital} is the capital of which state?`;
+
+                // Generate options with correct state
+                const options = generateStateOptions(stateData.state, statesCapitals.all);
+                currentAnswer = options.indexOf(stateData.state);
+                currentQuestion = { options: options };
+
+                // Display category badge
+                const categoryBadge = document.getElementById('categoryBadge');
+                categoryBadge.textContent = `🇺🇸 ${stateData.region} Region`;
+                categoryBadge.style.display = 'block';
+            }
+
+            // Clear feedback
+            document.getElementById('feedback').textContent = '';
+
+            // Display answer options as buttons
+            const optionsContainer = document.getElementById('answerOptions');
+            optionsContainer.innerHTML = '';
+
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.textContent = option;
+                button.dataset.index = index;
+                button.disabled = isPaused;
+                button.addEventListener('click', () => checkAnswer(index));
+                optionsContainer.appendChild(button);
+            });
+
+            // Start the timer
+            if (gameStarted && !isPaused && pendingPieceIndex === null) {
+                startTimer();
+            }
+        }
+
+        // Enable/disable buttons when pausing/resuming
+        function toggleButtonsState(enabled) {
+            const buttons = document.querySelectorAll('.option-btn');
+            buttons.forEach(btn => {
+                if (!btn.classList.contains('correct') && !btn.classList.contains('incorrect')) {
+                    btn.disabled = !enabled;
+                }
+            });
+        }
+
+        // Check answer
+        function checkAnswer(selectedIndex) {
+            if (!gameStarted || !currentQuestion || isPaused) return;
+
+            // Stop the timer
+            stopTimer();
+
+            const feedbackEl = document.getElementById('feedback');
+            const buttons = document.querySelectorAll('.option-btn');
+
+            // Disable all buttons
+            buttons.forEach(btn => btn.disabled = true);
+
+            // Highlight selected button
+            buttons[selectedIndex].classList.add('selected');
+
+            if (selectedIndex === currentAnswer) {
+                // Correct answer
+                total++;
+                correct++;
+                streak++;
+
+                buttons[selectedIndex].classList.add('correct');
+                feedbackEl.textContent = `🎉 Correct! Great job!`;
+                feedbackEl.className = 'feedback correct celebrating';
+
+                // Play success sound
+                playCorrectSound();
+
+                // Add reward - use center of screen
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                addReward(centerX, centerY);
+                updateScoreboard();
+
+                setTimeout(() => {
+                    if (!isPaused && gameStarted) {
+                        generateProblem();
+                    }
+                }, 1500);
+            } else {
+                // Wrong answer
+                total++;
+                streak = 0;
+
+                buttons[selectedIndex].classList.add('incorrect');
+                buttons[currentAnswer].classList.add('correct');
+
+                feedbackEl.textContent = `❌ Incorrect. The correct answer was: ${currentQuestion.options[currentAnswer]}`;
+                feedbackEl.className = 'feedback incorrect';
+
+                // Play wrong sound
+                playWrongSound();
+
+                updateScoreboard();
+
+                setTimeout(() => {
+                    if (!isPaused && gameStarted) {
+                        generateProblem();
+                    }
+                }, 2500);
+            }
+        }
+
+        // Handle timeout
         function handleTimeout() {
-            // TODO: Implement timeout handling
+            if (!gameStarted || isPaused || !currentQuestion) return;
+
+            total++;
+            streak = 0;
+
+            const feedbackEl = document.getElementById('feedback');
+            const buttons = document.querySelectorAll('.option-btn');
+
+            // Disable all buttons
+            buttons.forEach(btn => btn.disabled = true);
+
+            // Highlight correct answer
+            buttons[currentAnswer].classList.add('correct');
+
+            feedbackEl.textContent = `⏱️ Time's up! The correct answer was: ${currentQuestion.options[currentAnswer]}`;
+            feedbackEl.className = 'feedback incorrect';
+            playWrongSound();
+
+            updateScoreboard();
+
+            setTimeout(() => {
+                if (!isPaused) {
+                    generateProblem();
+                }
+            }, 3000);
         }
+
+        // Setup geography-specific listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mode buttons
+            document.querySelectorAll('[data-mode]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    mode = this.dataset.mode;
+                    usedQuestions.clear();
+                    usedStates.clear();
+
+                    if (gameStarted && !isPaused) {
+                        stopTimer();
+                        generateProblem();
+                    }
+                });
+            });
+
+            // Difficulty buttons
+            document.querySelectorAll('[data-level]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-level]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    difficulty = this.dataset.level;
+                    usedQuestions.clear();
+                    usedStates.clear();
+
+                    if (gameStarted && !isPaused) {
+                        stopTimer();
+                        generateProblem();
+                    }
+                });
+            });
+
+            // Hook into pause/resume events to control option buttons
+            // We need to wait a bit for common.js to set up its listeners first
+            setTimeout(() => {
+                const pauseBtn = document.getElementById('pauseBtn');
+                const startBtn = document.getElementById('startBtn');
+
+                if (pauseBtn) {
+                    // Add additional listener for pause to disable option buttons
+                    pauseBtn.addEventListener('click', function() {
+                        setTimeout(() => toggleButtonsState(false), 50);
+                    });
+                }
+
+                if (startBtn) {
+                    // Add additional listener for resume to enable option buttons
+                    const originalClickHandler = function() {
+                        if (gameStarted && !isPaused) {
+                            // After resume, enable option buttons
+                            setTimeout(() => toggleButtonsState(true), 150);
+                        }
+                    };
+                    startBtn.addEventListener('click', originalClickHandler);
+                }
+            }, 100);
+        });
     </script>
 </body>
 </html>

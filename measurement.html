@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Measurement & Unit Conversion</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page-math">
+    <a href="index.html" class="back-btn">← Back to Subjects</a>
+
+    <button class="sound-toggle" id="soundToggle">🔊</button>
+
+    <div class="left-panel" id="leftPanel">
+        <div class="difficulty-selector-left">
+            <div class="difficulty-title">🎯 Difficulty</div>
+            <button class="difficulty-btn active" data-level="easy">Easy (Basic)</button>
+            <button class="difficulty-btn" data-level="medium">Medium (More Units)</button>
+            <button class="difficulty-btn" data-level="hard">Hard (Complex)</button>
+        </div>
+    </div>
+
+    <div class="right-panel" id="rightPanel">
+        <div class="rewards-bank">
+            <div class="bank-title">🏦 My Rewards Bank 🏦</div>
+            <div class="rewards-container" id="rewards"></div>
+        </div>
+
+        <div class="puzzle-container">
+            <div class="puzzle-title">🧩 Jigsaw Puzzle</div>
+            <div class="puzzle-progress" id="puzzleProgress">0/16 pieces</div>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            <div class="puzzle-grid" id="puzzleGrid"></div>
+            <div class="puzzle-drop-zone" id="dropZone" style="display: none;">
+                <div class="drop-zone-text">Drag piece here! 👇</div>
+            </div>
+            <div class="puzzle-complete" id="puzzleComplete" style="display: none;">🎉🏆🎉</div>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        <h1>Measurement & Unit Conversion!</h1>
+
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-label">Correct</div>
+                <div class="score-value" id="correct">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Streak</div>
+                <div class="score-value" id="streak">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Total</div>
+                <div class="score-value" id="total">0</div>
+            </div>
+        </div>
+
+        <div class="timer-container">
+            <button class="control-btn" id="startBtn">Start ▶️</button>
+            <div class="timer" id="timer">45</div>
+            <button class="control-btn pause hidden" id="pauseBtn">Pause ⏸️</button>
+        </div>
+
+        <div class="problem-area">
+            <div class="problem" id="problem">Click Start to begin!</div>
+            <div class="category-badge" id="categoryBadge"></div>
+            <input type="number" class="answer-input" id="answer" placeholder="Enter your answer..." disabled>
+            <div class="keyboard-hint">Press Enter ↵ to submit</div>
+            <button class="submit-btn" id="submit" disabled>Check Answer</button>
+            <div class="feedback" id="feedback"></div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script src="measurement-data.js"></script>
+    <script>
+        // Check login status
+        checkLoginStatus();
+
+        // Measurement-specific variables
+        let currentProblem = null;
+        let currentAnswer = 0;
+        let difficulty = 'easy';
+        let isRetryAttempt = false;
+
+        // Generate a measurement problem
+        function generateProblem() {
+            const problems = measurementProblems[difficulty];
+            currentProblem = problems[Math.floor(Math.random() * problems.length)];
+            currentAnswer = currentProblem.answer;
+            isRetryAttempt = false;
+
+            const problemEl = document.getElementById('problem');
+            problemEl.textContent = currentProblem.question;
+
+            // Display category badge
+            const categoryBadge = document.getElementById('categoryBadge');
+            categoryBadge.textContent = `📏 ${currentProblem.category}`;
+            categoryBadge.style.display = 'block';
+
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('answer').focus();
+
+            // Start the timer
+            if (gameStarted && !isPaused && pendingPieceIndex === null) {
+                startTimer();
+            }
+        }
+
+        // Check answer
+        function checkAnswer() {
+            if (!gameStarted) return;
+
+            const userAnswer = parseFloat(document.getElementById('answer').value.trim());
+            const feedbackEl = document.getElementById('feedback');
+
+            if (isNaN(userAnswer) || document.getElementById('answer').value.trim() === '') {
+                feedbackEl.textContent = 'Please enter a number!';
+                feedbackEl.className = 'feedback incorrect';
+                return;
+            }
+
+            // Stop the timer
+            stopTimer();
+
+            if (userAnswer === currentAnswer) {
+                // Correct answer
+                total++;
+                correct++;
+                streak++;
+
+                if (isRetryAttempt) {
+                    feedbackEl.textContent = `🎉 Great! You got it right on your second try!`;
+                } else {
+                    feedbackEl.textContent = `🎉 Perfect! The answer is ${currentAnswer} ${currentProblem.unit}!`;
+                }
+                feedbackEl.className = 'feedback correct celebrating';
+
+                // Play success sound
+                playCorrectSound();
+
+                // Add reward
+                addRewardSimple(window.innerWidth / 2, window.innerHeight / 2);
+                updateScoreboard();
+
+                setTimeout(() => {
+                    if (!isPaused) {
+                        generateProblem();
+                    }
+                }, 1500);
+            } else {
+                // Wrong answer
+                if (!isRetryAttempt) {
+                    // First mistake - give them another try
+                    isRetryAttempt = true;
+                    feedbackEl.textContent = `❌ Try again! (Hint: The correct answer is ${currentAnswer} ${currentProblem.unit})`;
+                    feedbackEl.className = 'feedback incorrect';
+
+                    // Play wrong sound
+                    playWrongSound();
+
+                    // Clear the input
+                    document.getElementById('answer').value = '';
+
+                    // Restart timer for retry
+                    setTimeout(() => {
+                        if (!isPaused && gameStarted) {
+                            startTimer();
+                        }
+                    }, 1500);
+                } else {
+                    // Second mistake - count it and move on
+                    total++;
+                    streak = 0;
+                    feedbackEl.textContent = `❌ The correct answer was ${currentAnswer} ${currentProblem.unit}. Moving to next question...`;
+                    feedbackEl.className = 'feedback incorrect';
+
+                    // Play wrong sound
+                    playWrongSound();
+
+                    updateScoreboard();
+
+                    setTimeout(() => {
+                        if (!isPaused) {
+                            generateProblem();
+                        }
+                    }, 3000);
+                }
+            }
+        }
+
+        // Handle timeout
+        function handleTimeout() {
+            if (!gameStarted || isPaused) return;
+
+            const feedbackEl = document.getElementById('feedback');
+
+            if (!isRetryAttempt) {
+                // First timeout - give them another try
+                isRetryAttempt = true;
+                feedbackEl.textContent = `⏱️ Time's up! Try again! (Hint: ${currentAnswer} ${currentProblem.unit})`;
+                feedbackEl.className = 'feedback incorrect';
+                playWrongSound();
+
+                // Clear input
+                document.getElementById('answer').value = '';
+
+                // Restart timer for retry
+                setTimeout(() => {
+                    if (!isPaused && gameStarted) {
+                        startTimer();
+                    }
+                }, 2000);
+            } else {
+                // Second timeout - count it and move on
+                total++;
+                streak = 0;
+
+                feedbackEl.textContent = `⏱️ Time's up again! The answer was ${currentAnswer} ${currentProblem.unit}. Moving on...`;
+                feedbackEl.className = 'feedback incorrect';
+                playWrongSound();
+
+                updateScoreboard();
+
+                setTimeout(() => {
+                    if (!isPaused) {
+                        generateProblem();
+                    }
+                }, 3000);
+            }
+        }
+
+        // Setup measurement-specific listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Submit button
+            document.getElementById('submit').addEventListener('click', checkAnswer);
+
+            // Enter key to submit
+            document.getElementById('answer').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+
+            // Difficulty buttons
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    difficulty = this.dataset.level;
+
+                    if (gameStarted && !isPaused) {
+                        stopTimer();
+                        generateProblem();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -13,11 +13,18 @@
     <button class="sound-toggle" id="soundToggle">🔊</button>
 
     <div class="left-panel" id="leftPanel">
+        <div class="difficulty-selector-left" style="margin-bottom: 20px;">
+            <div class="difficulty-title">📚 Mode</div>
+            <button class="difficulty-btn active" data-mode="words">📖 Words</button>
+            <button class="difficulty-btn" data-mode="states">🗺️ US States</button>
+            <button class="difficulty-btn" data-mode="capitals">🏛️ US Capitals</button>
+        </div>
+
         <div class="difficulty-selector-left">
-            <div class="difficulty-title">🎯 Word Length</div>
-            <button class="difficulty-btn active" data-level="easy">Easy (4-7 letters)</button>
-            <button class="difficulty-btn" data-level="medium">Medium (8-12 letters)</button>
-            <button class="difficulty-btn" data-level="hard">Hard (13+ letters)</button>
+            <div class="difficulty-title">🎯 Difficulty</div>
+            <button class="difficulty-btn active" data-level="easy">Easy</button>
+            <button class="difficulty-btn" data-level="medium">Medium</button>
+            <button class="difficulty-btn" data-level="hard">Hard</button>
         </div>
     </div>
 
@@ -68,6 +75,7 @@
 
     <script src="common.js"></script>
     <script src="spelling-words.js"></script>
+    <script src="states-capitals-data.js"></script>
     <script>
         // Check login status
         checkLoginStatus();
@@ -77,6 +85,8 @@
         let difficulty = 'easy';
         let currentWord = '';
         let isRetryAttempt = false;
+        let mode = 'words'; // 'words', 'states', or 'capitals'
+        let usedStates = new Set();
 
         // ========================================
         // MERRIAM-WEBSTER API CONFIGURATION
@@ -206,26 +216,105 @@
 
         // Generate a spelling problem
         function generateProblem() {
+            if (mode === 'words') {
+                generateWordSpelling();
+            } else if (mode === 'states') {
+                generateStateSpelling();
+            } else if (mode === 'capitals') {
+                generateCapitalSpelling();
+            }
+        }
+
+        // Generate word spelling problem
+        function generateWordSpelling() {
             const wordList = spellingWords[difficulty];
             currentWord = wordList[Math.floor(Math.random() * wordList.length)];
             currentAnswer = currentWord.toLowerCase();
-            isRetryAttempt = false; // Reset retry flag for new word
+            isRetryAttempt = false;
 
             const problemEl = document.getElementById('problem');
             problemEl.textContent = '🔊 Listen and spell the word...';
 
             document.getElementById('answer').value = '';
             document.getElementById('feedback').textContent = '';
-            hideDefinition(); // Hide definition from previous word
+            hideDefinition();
             document.getElementById('answer').focus();
 
-            // Speak the word (will also fetch and display definition if M-W API is used)
             speakWord(currentWord);
-
-            // Enable pronounce button
             document.getElementById('pronounceBtn').disabled = false;
 
-            // Start the timer only if game is running and not paused
+            if (gameStarted && !isPaused && pendingPieceIndex === null) {
+                startTimer();
+            }
+        }
+
+        // Generate US state spelling
+        function generateStateSpelling() {
+            const statesList = statesCapitals[difficulty] || statesCapitals.all;
+
+            if (usedStates.size >= statesList.length) {
+                usedStates.clear();
+            }
+
+            let stateIndex;
+            do {
+                stateIndex = Math.floor(Math.random() * statesList.length);
+            } while (usedStates.has(stateIndex));
+
+            usedStates.add(stateIndex);
+            const stateData = statesList[stateIndex];
+
+            currentWord = stateData.state;
+            currentAnswer = stateData.state.toLowerCase();
+            isRetryAttempt = false;
+
+            const problemEl = document.getElementById('problem');
+            problemEl.textContent = `🗺️ Spell this US State... (Capital: ${stateData.capital})`;
+
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').textContent = '';
+            hideDefinition();
+            document.getElementById('answer').focus();
+
+            speakWord(currentWord);
+            document.getElementById('pronounceBtn').disabled = false;
+
+            if (gameStarted && !isPaused && pendingPieceIndex === null) {
+                startTimer();
+            }
+        }
+
+        // Generate US capital spelling
+        function generateCapitalSpelling() {
+            const statesList = statesCapitals[difficulty] || statesCapitals.all;
+
+            if (usedStates.size >= statesList.length) {
+                usedStates.clear();
+            }
+
+            let stateIndex;
+            do {
+                stateIndex = Math.floor(Math.random() * statesList.length);
+            } while (usedStates.has(stateIndex));
+
+            usedStates.add(stateIndex);
+            const stateData = statesList[stateIndex];
+
+            currentWord = stateData.capital;
+            currentAnswer = stateData.capital.toLowerCase();
+            isRetryAttempt = false;
+
+            const problemEl = document.getElementById('problem');
+            problemEl.textContent = `🏛️ Spell the capital of ${stateData.state}...`;
+
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').textContent = '';
+            hideDefinition();
+            document.getElementById('answer').focus();
+
+            speakWord(currentWord);
+            document.getElementById('pronounceBtn').disabled = false;
+
             if (gameStarted && !isPaused && pendingPieceIndex === null) {
                 startTimer();
             }
@@ -383,12 +472,28 @@
                 }
             });
 
-            // Difficulty buttons
-            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+            // Mode buttons
+            document.querySelectorAll('[data-mode]').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                    document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    mode = this.dataset.mode;
+                    usedStates.clear();
+
+                    if (gameStarted && !isPaused) {
+                        stopTimer();
+                        generateProblem();
+                    }
+                });
+            });
+
+            // Difficulty buttons
+            document.querySelectorAll('[data-level]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('[data-level]').forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
                     difficulty = this.dataset.level;
+                    usedStates.clear();
 
                     if (gameStarted && !isPaused) {
                         stopTimer();
