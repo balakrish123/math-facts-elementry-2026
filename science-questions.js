@@ -153,6 +153,142 @@ const scienceQuestions = {
             options: ["degree Celsius (°C)", "gram (g)", "milliliter (mL)", "centimeter (cm)"],
             correct: 3,
             category: "Physical Science"
+        },
+
+        // Human Body - Skeletal System (Easy)
+        {
+            question: "How many bones does the adult human body have?",
+            options: ["210", "206", "180", "126"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "Which bone is the longest and strongest bone in the human body?",
+            options: ["Cranium", "Femur", "Tibia", "Radius"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "Tendons hold muscle to bone.",
+            options: ["True", "False"],
+            correct: 0,
+            category: "Human Body"
+        },
+        {
+            question: "Ligaments hold bone to bone.",
+            options: ["True", "False"],
+            correct: 0,
+            category: "Human Body"
+        },
+        {
+            question: "The sternum is a very important bone that protects the",
+            options: ["Brain", "Heart", "Liver", "Stomach"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "Of the following, which is a basic need of all living things?",
+            options: ["Oxygen gas", "Light", "Hydrogen gas", "Water"],
+            correct: 3,
+            category: "Biology"
+        },
+        {
+            question: "The adult human of average age and size has approximately how many quarts of blood?",
+            options: ["4", "6", "8", "10"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "The larval form of butterflies and moths is more commonly known as what?",
+            options: ["Pupa", "Caterpillar", "Chrysalis", "Nymph"],
+            correct: 1,
+            category: "Biology"
+        },
+        {
+            question: "A virus must do what to reproduce?",
+            options: ["Form a latent virus", "Undergo transformation", "Infect a cell", "Conjugate"],
+            correct: 2,
+            category: "Biology"
+        },
+
+        // Body Parts (Easy)
+        {
+            question: "A chair has four of these. You have two.",
+            options: ["Arms", "Legs", "Feet", "Hands"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "You have 32 of these and you use them to eat.",
+            options: ["Teeth", "Taste buds", "Muscles", "Bones"],
+            correct: 0,
+            category: "Human Body"
+        },
+        {
+            question: "You use this part of the body to taste things.",
+            options: ["Lips", "Teeth", "Tongue", "Throat"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "This part sends blood around your body.",
+            options: ["Lungs", "Brain", "Heart", "Liver"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "Without these you can't breathe.",
+            options: ["Heart", "Lungs", "Stomach", "Kidneys"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "These are usually brown, blue, green or hazel.",
+            options: ["Hair", "Nails", "Eyes", "Teeth"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "You use this to talk, eat and smile.",
+            options: ["Nose", "Mouth", "Ears", "Eyes"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "You have one on your face. You use it to smell.",
+            options: ["Mouth", "Chin", "Nose", "Forehead"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "You put shoes on these.",
+            options: ["Hands", "Feet", "Legs", "Ankles"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "As children, we have 20 baby teeth that fall out, making way for how many permanent adult teeth?",
+            options: ["24", "28", "32", "36"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "Canines are pointed teeth for gripping and tearing.",
+            options: ["True", "False"],
+            correct: 0,
+            category: "Human Body"
+        },
+        {
+            question: "You should aim to drink how many glasses of water every day?",
+            options: ["2-3", "4-5", "6-8", "10-12"],
+            correct: 2,
+            category: "Health"
+        },
+        {
+            question: "When it starts to get dark, your brain releases a chemical to make you feel sleepy. This chemical is called",
+            options: ["Dopamine", "Serotonin", "Melatonin", "Adrenaline"],
+            correct: 2,
+            category: "Human Body"
         }
     ],
 
@@ -285,12 +421,6 @@ const scienceQuestions = {
             category: "Physical Science"
         },
         {
-            question: "Which unit should be used when a student uses a metric ruler to measure the length of a desk?",
-            options: ["degree Celsius (°C)", "gram (g)", "milliliter (mL)", "centimeter (cm)"],
-            correct: 3,
-            category: "Physical Science"
-        },
-        {
             question: "A student rubs her hands together. Her hands will feel warmer due to heat produced by",
             options: ["erosion", "friction", "gravity", "sunlight"],
             correct: 1,
@@ -301,6 +431,172 @@ const scienceQuestions = {
             options: ["the Sun", "the Moon", "a star", "a planet"],
             correct: 1,
             category: "Astronomy"
+        },
+
+        // Human Body - Skeletal System (Medium)
+        {
+            question: "The Axial skeleton is comprised of how many bones?",
+            options: ["90", "126", "60", "80"],
+            correct: 3,
+            category: "Human Body"
+        },
+        {
+            question: "How many bones make up the human spine?",
+            options: ["7", "33", "20", "25"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "The Appendicular skeleton is comprised of how many bones?",
+            options: ["126", "100", "80", "110"],
+            correct: 0,
+            category: "Human Body"
+        },
+        {
+            question: "Which of the following bones is an example of a short bone?",
+            options: ["Femur", "Cranium", "Carpals", "Radius"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "The smallest of the formed elements of the blood are the",
+            options: ["White cells", "Red cells", "Platelets", "Plasma"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "What is the primary function of platelets in human blood?",
+            options: ["Carry oxygen", "Fight infection", "Clotting", "Transport nutrients"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "Surplus red blood cells, needed to meet an emergency, are mainly stored in what organ?",
+            options: ["Pancreas", "Spleen", "Liver", "Kidneys"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "In the human brain, body temperature, metabolism, heart rate, and sleep are influenced by this region",
+            options: ["Hypothalamus", "Midbrain", "Corpus callosum", "Cerebellum"],
+            correct: 0,
+            category: "Human Body"
+        },
+        {
+            question: "Digestion of carbohydrates begins where?",
+            options: ["Small intestines", "Colon", "Mouth", "Stomach"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "Digestion of proteins begins in which of the following human organs?",
+            options: ["Small intestines", "Colon", "Mouth", "Stomach"],
+            correct: 3,
+            category: "Human Body"
+        },
+        {
+            question: "Bile has what function in digestion?",
+            options: ["Emulsify lipids", "Digest proteins", "Store glucose", "Digest carbohydrates"],
+            correct: 0,
+            category: "Human Body"
+        },
+
+        // Body Parts (Medium)
+        {
+            question: "People often get these pierced.",
+            options: ["Nose", "Ears", "Eyebrows", "Lips"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "A belt usually goes around this.",
+            options: ["Neck", "Chest", "Waist", "Hips"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "You can put a watch on this part of the body.",
+            options: ["Ankle", "Wrist", "Finger", "Neck"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "They are halfway down your legs.",
+            options: ["Ankles", "Thighs", "Knees", "Shins"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "The part of your body where food is digested after you've eaten it.",
+            options: ["Intestines", "Stomach", "Liver", "Esophagus"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "There are five of these on each foot.",
+            options: ["Bones", "Muscles", "Toes", "Joints"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "People who lift weights and workout a lot have big ones.",
+            options: ["Bones", "Muscles", "Organs", "Joints"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "You can put a ring on this.",
+            options: ["Toe", "Finger", "Ear", "Nose"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "This helps your arm to bend.",
+            options: ["Shoulder", "Wrist", "Elbow", "Knuckle"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "You have one on each hand. They are short and fat.",
+            options: ["Fingers", "Thumbs", "Knuckles", "Palms"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "This connects your head to your body.",
+            options: ["Spine", "Shoulders", "Neck", "Collarbone"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "How many different types of bacteria live in our mouths?",
+            options: ["Around 100", "Around 300", "Around 700", "Around 1000"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "How long is the small intestine?",
+            options: ["Around 6 metres", "Around 8 metres", "Around 10 metres", "Around 12 metres"],
+            correct: 0,
+            category: "Human Body"
+        },
+        {
+            question: "Some human blood is blue.",
+            options: ["True", "False"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "Premolars are the largest human teeth.",
+            options: ["True", "False"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "Starchy carbohydrate foods include pasta, potatoes, bread and cheese.",
+            options: ["True", "False"],
+            correct: 1,
+            category: "Health"
         }
     ],
 
@@ -515,6 +811,172 @@ const scienceQuestions = {
             options: ["it becomes darker in color", "it becomes lighter in color", "it changes shape completely", "it stays exactly the same"],
             correct: 0,
             category: "Physical Science"
+        },
+
+        // Human Body - Skeletal System (Hard)
+        {
+            question: "The human vertebrae are classified as which type of bone?",
+            options: ["Long", "Irregular", "Flat", "Short"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "The ribs, sternum and scapulae are all what type of bone?",
+            options: ["Long", "Flat", "Short", "Irregular"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "Which of the following bones is an example of a long bone?",
+            options: ["Ribs", "Ulna", "Phalanges", "Mandible"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "Once erythrocytes (red blood cells) enter the blood in humans, they have an average lifetime of how many days?",
+            options: ["10 days", "120 days", "200 days", "360 days"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "The several types of white blood cells are sometimes collectively referred to as",
+            options: ["Erythrocytes", "Leukocytes", "Erythroblasts", "Thrombocytes"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "Lengthening of long bones in humans occurs in which area of the bone?",
+            options: ["Medullary canal", "Cancellous bone", "Periosteum", "Epiphysis"],
+            correct: 3,
+            category: "Human Body"
+        },
+        {
+            question: "All cells of an organism find their lineage from a single fertilized cell called what?",
+            options: ["Gamete", "Zygote", "Embryo", "Blastocyst"],
+            correct: 1,
+            category: "Biology"
+        },
+        {
+            question: "Name the clear watery liquid that surrounds the brain and spinal cord",
+            options: ["Plasma", "Lymph", "Cerebrospinal fluid", "Synovial fluid"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "The physical appearance and properties of an organism which is the expression of the genetic makeup is called the",
+            options: ["Phenotype", "Pangenesis", "Parental trait", "Genotype"],
+            correct: 0,
+            category: "Biology"
+        },
+        {
+            question: "During the final stage of cell division, the chromosomes become attenuated and the nuclear membrane is reconstituted. This phase is known as",
+            options: ["Prophase", "Metaphase", "Anaphase", "Telophase"],
+            correct: 3,
+            category: "Biology"
+        },
+        {
+            question: "A layer of dead skin cells is found in the",
+            options: ["Subcutaneous tissue", "Dermis", "Epidermis", "Hypodermis"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "The nervous system develops from which germ layer?",
+            options: ["Ectoderm", "Mesoderm", "Endoderm", "Blastoderm"],
+            correct: 0,
+            category: "Biology"
+        },
+        {
+            question: "During inspiration, the diaphragm moves",
+            options: ["Down by contraction", "Down by relaxation", "Up by contraction", "Up by relaxation"],
+            correct: 0,
+            category: "Human Body"
+        },
+        {
+            question: "Which of the following is NOT a function of the kidney?",
+            options: ["Excretion of urea", "Regulation of fluids", "Elimination of toxins", "Defecation"],
+            correct: 3,
+            category: "Human Body"
+        },
+        {
+            question: "The chromosomes of a eukaryotic cell are located in the",
+            options: ["Mitochondria", "Nucleus", "Ribosome", "Endoplasm"],
+            correct: 1,
+            category: "Biology"
+        },
+        {
+            question: "Organisms with cells containing two sets of parental chromosomes are called",
+            options: ["Diploid", "Bisomal", "Haploid", "Autosomal"],
+            correct: 0,
+            category: "Biology"
+        },
+        {
+            question: "Which of the following statements is TRUE of insulin?",
+            options: ["Secreted by pancreas", "A protein", "Involved in glucose metabolism", "All of the above"],
+            correct: 3,
+            category: "Human Body"
+        },
+        {
+            question: "Costal cartilage functions to",
+            options: ["Attach ribs to sternum", "Cover ends of femur", "Form ear structure", "Form vertebral disks"],
+            correct: 0,
+            category: "Human Body"
+        },
+
+        // Body Parts (Hard)
+        {
+            question: "It can be straight, curly or wavy.",
+            options: ["Eyelashes", "Eyebrows", "Hair", "Fingernails"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "Women often paint these.",
+            options: ["Lips", "Eyelids", "Nails", "Cheeks"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "The part of your body with your hair, eyes, nose, mouth and ears on.",
+            options: ["Face", "Head", "Skull", "Cranium"],
+            correct: 1,
+            category: "Human Body"
+        },
+        {
+            question: "This part of the body is between your eyebrows and hair.",
+            options: ["Scalp", "Temple", "Forehead", "Crown"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "You usually lie down on this.",
+            options: ["Stomach", "Side", "Back", "Chest"],
+            correct: 2,
+            category: "Human Body"
+        },
+        {
+            question: "Identical twins have identical fingerprints.",
+            options: ["True", "False"],
+            correct: 1,
+            category: "Biology"
+        },
+        {
+            question: "If you have 5 cups of orange juice in a day, that counts as your 5 daily portions of fruit and vegetables.",
+            options: ["True", "False"],
+            correct: 1,
+            category: "Health"
+        },
+        {
+            question: "Nicotine is a drug found in energy drinks.",
+            options: ["True", "False"],
+            correct: 1,
+            category: "Health"
+        },
+        {
+            question: "Identical twins come from just one egg and one sperm.",
+            options: ["True", "False"],
+            correct: 0,
+            category: "Biology"
         }
     ]
 };
