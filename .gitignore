@@ -1,0 +1,14 @@
+# Large data files
+*.csv.zst
+*.csv.gz
+
+# OS files
+.DS_Store
+
+# Editor files
+*.swp
+*.swo
+*~
+
+# Environment
+.env
