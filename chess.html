@@ -255,7 +255,7 @@
             document.getElementById('answer').focus();
 
             // Start the timer
-            if (gameStarted && !isPaused && pendingPieceIndex === null) {
+            if (gameStarted && !isPaused) {
                 startTimer();
             }
         }
@@ -291,11 +291,6 @@
                 feedbackEl.className = 'feedback correct celebrating';
 
                 playCorrectSound();
-
-                const centerX = window.innerWidth / 2;
-                const centerY = window.innerHeight / 2;
-                addReward(centerX, centerY);
-
                 updateScoreboard();
 
                 setTimeout(() => {

@@ -1604,7 +1604,7 @@ h1 {
     padding: 0;
     margin: 0;
     overflow: hidden;
-    background: #1a1a2e;
+    background: #2e4a1e;
 }
 
 .page-chess .left-panel,
@@ -1630,7 +1630,7 @@ h1 {
     top: 0;
     left: 0;
     align-items: stretch;
-    background: #1a1a2e;
+    background: #2e4a1e;
     z-index: 10;
 }
 
@@ -1875,36 +1875,44 @@ h1 {
 }
 
 .chess-square.light {
-    background-color: #ffffff;
+    background-color: #f0e6d2;
 }
 
 .chess-square.dark {
-    background-color: #4caf50;
+    background-color: #5a9e3e;
 }
 
 .chess-piece {
-    font-size: clamp(2.2em, 7vw, 4.5em);
+    font-size: clamp(2.4em, 7.5vw, 5em);
     line-height: 1;
     cursor: default;
     user-select: none;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.3));
+    transition: transform 0.15s ease;
 }
 
 .chess-piece.white-piece {
-    color: #fff;
+    color: #fffdf5;
     text-shadow:
-        -1px -1px 0 #333,
-         1px -1px 0 #333,
-        -1px  1px 0 #333,
-         1px  1px 0 #333,
-         0   -2px 0 #333,
-         0    2px 0 #333,
-        -2px  0   0 #333,
-         2px  0   0 #333;
+        -1px -1px 0 #444,
+         1px -1px 0 #444,
+        -1px  1px 0 #444,
+         1px  1px 0 #444,
+         0   -2px 0 #444,
+         0    2px 0 #444,
+        -2px  0   0 #444,
+         2px  0   0 #444,
+         0    0   6px rgba(255,255,255,0.4);
 }
 
 .chess-piece.black-piece {
     color: #1a1a1a;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    text-shadow:
+        -1px -1px 0 #555,
+         1px -1px 0 #555,
+        -1px  1px 0 #555,
+         1px  1px 0 #555,
+         0    3px 4px rgba(0,0,0,0.35);
 }
 
 .chess-file-labels {
