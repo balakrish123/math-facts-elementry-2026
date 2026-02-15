@@ -5,7 +5,8 @@ let correct = 0;
 let total = 0;
 let streak = 0;
 let soundEnabled = true;
-let timeLeft = 45;
+const timerDuration = parseInt(document.getElementById('timer')?.textContent) || 45;
+let timeLeft = timerDuration;
 let timerInterval = null;
 let puzzlePiecesRevealed = 0;
 const totalPuzzlePieces = 16;
@@ -160,7 +161,7 @@ function addReward(x, y) {
 
 // Timer functions
 function startTimer() {
-    timeLeft = 45;
+    timeLeft = timerDuration;
     updateTimerDisplay();
 
     if (timerInterval) clearInterval(timerInterval);

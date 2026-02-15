@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Puzzles</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="page-chess">
+    <a href="index.html" class="back-btn">← Back to Subjects</a>
+
+    <button class="sound-toggle" id="soundToggle">🔊</button>
+
+    <div class="chess-layout">
+        <div class="chess-left-panel">
+            <h1>Chess Puzzles! ♟️</h1>
+
+            <div class="difficulty-selector-left">
+                <div class="difficulty-title">Difficulty</div>
+                <div class="chess-difficulty-row">
+                    <button class="difficulty-btn active" data-level="easy">Easy</button>
+                    <button class="difficulty-btn" data-level="medium">Medium</button>
+                    <button class="difficulty-btn" data-level="hard">Hard</button>
+                </div>
+            </div>
+
+            <div class="score-board">
+                <div class="score-item">
+                    <div class="score-label">Correct</div>
+                    <div class="score-value" id="correct">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Wrong</div>
+                    <div class="score-value" id="wrong">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Streak</div>
+                    <div class="score-value" id="streak">0</div>
+                </div>
+                <div class="score-item">
+                    <div class="score-label">Total</div>
+                    <div class="score-value" id="total">0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="chess-board-panel">
+            <div class="chess-board-container" id="chessBoardContainer" style="display: none;">
+                <div class="chess-board" id="chessBoard"></div>
+            </div>
+            <div class="chess-move-indicator" id="moveIndicator">
+                <div class="move-checkbox white-check" title="White to move">
+                    <span class="move-check-box" id="whiteCheck"></span>
+                    <span class="move-piece-icon white-icon">♔</span>
+                </div>
+                <div class="move-checkbox black-check" title="Black to move">
+                    <span class="move-check-box" id="blackCheck"></span>
+                    <span class="move-piece-icon black-icon">♚</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chess-controls-panel">
+            <div class="timer-container">
+                <button class="control-btn" id="startBtn">Start ▶️</button>
+                <div class="timer" id="timer">90</div>
+                <button class="control-btn pause hidden" id="pauseBtn">Pause ⏸️</button>
+            </div>
+
+            <div class="problem-area">
+                <div class="problem" id="problem">Click Start to begin!</div>
+                <div class="category-badge" id="categoryBadge" style="display: none;"></div>
+                <input type="text" class="answer-input" id="answer" placeholder="e.g., Qh7#" disabled autocomplete="off" autocapitalize="off" spellcheck="false">
+                <div class="keyboard-hint">Type your move in algebraic notation (e.g., Qh7, Rxf8, Nf6) and press Enter ↵</div>
+                <button class="submit-btn" id="submit" disabled>Check Move ♟️</button>
+                <div class="feedback" id="feedback"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="common.js"></script>
+    <script>
+        // Check login status
+        checkLoginStatus();
+
+        // Chess-specific variables
+        let currentPuzzle = null;
+        let difficulty = 'easy';
+        let usedPuzzles = new Set();
+        let wrongCount = 0;
+
+        // Puzzle cache - only loaded when needed
+        const puzzleCache = {};
+
+        // Load puzzles for a difficulty level (lazy loaded via script tag)
+        function loadPuzzles(level) {
+            // Return cached puzzles if already loaded
+            if (puzzleCache[level]) return Promise.resolve(puzzleCache[level]);
+
+            // Check if already loaded via script tag
+            const globalKey = 'puzzleData_' + level;
+            if (window[globalKey]) {
+                puzzleCache[level] = window[globalKey];
+                return Promise.resolve(puzzleCache[level]);
+            }
+
+            document.getElementById('problem').textContent = 'Loading puzzles...';
+
+            return new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = `puzzles-${level}.js`;
+                script.onload = () => {
+                    puzzleCache[level] = window[globalKey];
+                    resolve(puzzleCache[level]);
+                };
+                script.onerror = () => {
+                    document.getElementById('problem').textContent = 'Failed to load puzzles!';
+                    resolve(null);
+                };
+                document.head.appendChild(script);
+            });
+        }
+
+        // Unicode piece mapping - using filled symbols for both colors
+        const pieceMap = {
+            'K': '♚', 'Q': '♛', 'R': '♜', 'B': '♝', 'N': '♞', 'P': '♟',
+            'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+        };
+
+        // Check if a FEN character is a white piece (uppercase)
+        function isWhitePiece(ch) {
+            return ch >= 'A' && ch <= 'Z';
+        }
+
+        // Parse FEN string into 8x8 board array
+        function parseFEN(fen) {
+            const rows = fen.split(' ')[0].split('/');
+            const board = [];
+            for (let r = 0; r < 8; r++) {
+                const row = [];
+                for (let c = 0; c < rows[r].length; c++) {
+                    const ch = rows[r][c];
+                    if (ch >= '1' && ch <= '8') {
+                        for (let i = 0; i < parseInt(ch); i++) {
+                            row.push('');
+                        }
+                    } else {
+                        row.push(ch);
+                    }
+                }
+                board.push(row);
+            }
+            return board;
+        }
+
+        // Render chess board from FEN
+        function renderChessBoard(fen) {
+            const board = parseFEN(fen);
+            const boardEl = document.getElementById('chessBoard');
+            boardEl.innerHTML = '';
+
+            // File labels (a-h) - top
+            const topLabels = document.createElement('div');
+            topLabels.className = 'chess-file-labels';
+            topLabels.innerHTML = '<span></span>';
+            for (let f = 0; f < 8; f++) {
+                topLabels.innerHTML += `<span>${String.fromCharCode(97 + f)}</span>`;
+            }
+            boardEl.appendChild(topLabels);
+
+            for (let r = 0; r < 8; r++) {
+                const rankNum = 8 - r;
+
+                // Rank label
+                const rankLabel = document.createElement('span');
+                rankLabel.className = 'chess-rank-label';
+                rankLabel.textContent = rankNum;
+                boardEl.appendChild(rankLabel);
+
+                for (let c = 0; c < 8; c++) {
+                    const square = document.createElement('div');
+                    const isLight = (r + c) % 2 === 0;
+                    square.className = `chess-square ${isLight ? 'light' : 'dark'}`;
+
+                    if (board[r][c]) {
+                        const piece = document.createElement('span');
+                        const colorClass = isWhitePiece(board[r][c]) ? 'white-piece' : 'black-piece';
+                        piece.className = `chess-piece ${colorClass}`;
+                        piece.textContent = pieceMap[board[r][c]] || '';
+                        square.appendChild(piece);
+                    }
+
+                    boardEl.appendChild(square);
+                }
+            }
+
+            // File labels (a-h) - bottom
+            const bottomLabels = document.createElement('div');
+            bottomLabels.className = 'chess-file-labels';
+            bottomLabels.innerHTML = '<span></span>';
+            for (let f = 0; f < 8; f++) {
+                bottomLabels.innerHTML += `<span>${String.fromCharCode(97 + f)}</span>`;
+            }
+            boardEl.appendChild(bottomLabels);
+
+            // Turn indicator
+            const turnChar = fen.split(' ')[1] || 'w';
+            const turnIndicator = document.createElement('div');
+            turnIndicator.className = `chess-turn-indicator ${turnChar === 'w' ? 'white-turn' : 'black-turn'}`;
+            turnIndicator.title = turnChar === 'w' ? 'White to move' : 'Black to move';
+            boardEl.appendChild(turnIndicator);
+
+            document.getElementById('chessBoardContainer').style.display = 'flex';
+
+            // Update move indicator checkboxes
+            const whiteCheck = document.getElementById('whiteCheck');
+            const blackCheck = document.getElementById('blackCheck');
+            whiteCheck.classList.toggle('checked', turnChar === 'w');
+            blackCheck.classList.toggle('checked', turnChar !== 'w');
+        }
+
+        // Generate a chess puzzle
+        async function generateProblem() {
+            const puzzles = await loadPuzzles(difficulty);
+            if (!puzzles) return;
+
+            // Reset used puzzles if we've used them all
+            if (usedPuzzles.size >= puzzles.length) {
+                usedPuzzles.clear();
+            }
+
+            // Find an unused puzzle
+            let puzzleIndex;
+            do {
+                puzzleIndex = Math.floor(Math.random() * puzzles.length);
+            } while (usedPuzzles.has(puzzleIndex));
+
+            usedPuzzles.add(puzzleIndex);
+            currentPuzzle = puzzles[puzzleIndex];
+
+            // Display question
+            document.getElementById('problem').textContent = currentPuzzle.question;
+
+            // Display category badge
+            const categoryBadge = document.getElementById('categoryBadge');
+            categoryBadge.textContent = `♟️ Puzzle #${currentPuzzle.problemNumber} - ${currentPuzzle.category}`;
+            categoryBadge.style.display = 'inline-block';
+
+            // Render chess board
+            renderChessBoard(currentPuzzle.fen);
+
+            // Clear input and feedback
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('answer').focus();
+
+            // Start the timer
+            if (gameStarted && !isPaused && pendingPieceIndex === null) {
+                startTimer();
+            }
+        }
+
+        // Check answer
+        function checkAnswer() {
+            if (!gameStarted || !currentPuzzle) return;
+
+            const userAnswer = document.getElementById('answer').value.trim();
+            const feedbackEl = document.getElementById('feedback');
+
+            if (!userAnswer) {
+                feedbackEl.textContent = 'Please enter a move!';
+                feedbackEl.className = 'feedback incorrect';
+                return;
+            }
+
+            stopTimer();
+            total++;
+
+            // Normalize the user answer for comparison
+            const normalizedAnswer = userAnswer.replace(/[\s]/g, '');
+
+            // Check against accepted answers (case-insensitive)
+            const isCorrect = currentPuzzle.acceptedAnswers.some(
+                accepted => accepted.toLowerCase() === normalizedAnswer.toLowerCase()
+            );
+
+            if (isCorrect) {
+                correct++;
+                streak++;
+                feedbackEl.textContent = `🎉 Correct! ${currentPuzzle.answer} is right!`;
+                feedbackEl.className = 'feedback correct celebrating';
+
+                playCorrectSound();
+
+                const centerX = window.innerWidth / 2;
+                const centerY = window.innerHeight / 2;
+                addReward(centerX, centerY);
+
+                updateScoreboard();
+
+                setTimeout(() => {
+                    if (!isPaused && gameStarted) {
+                        generateProblem();
+                    }
+                }, 1500);
+            } else {
+                streak = 0;
+                wrongCount++;
+                document.getElementById('wrong').textContent = wrongCount;
+                feedbackEl.textContent = `Not quite. The correct move is ${currentPuzzle.answer}`;
+                feedbackEl.className = 'feedback incorrect';
+
+                playWrongSound();
+
+                updateScoreboard();
+
+                setTimeout(() => {
+                    if (!isPaused && gameStarted) {
+                        generateProblem();
+                    }
+                }, 2500);
+            }
+        }
+
+        // Handle timeout
+        function handleTimeout() {
+            if (!gameStarted || isPaused || !currentPuzzle) return;
+
+            total++;
+            streak = 0;
+            wrongCount++;
+            document.getElementById('wrong').textContent = wrongCount;
+
+            const feedbackEl = document.getElementById('feedback');
+            feedbackEl.textContent = `⏱️ Time's up! The correct move was ${currentPuzzle.answer}`;
+            feedbackEl.className = 'feedback incorrect';
+            playWrongSound();
+
+            updateScoreboard();
+
+            setTimeout(() => {
+                if (!isPaused && gameStarted) {
+                    generateProblem();
+                }
+            }, 3000);
+        }
+
+        // Setup chess-specific listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Submit button
+            document.getElementById('submit').addEventListener('click', checkAnswer);
+
+            // Enter key to submit
+            document.getElementById('answer').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+
+            // Difficulty buttons
+            document.querySelectorAll('.difficulty-btn').forEach(btn => {
+                btn.addEventListener('click', async function() {
+                    document.querySelectorAll('.difficulty-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    difficulty = this.dataset.level;
+                    usedPuzzles.clear();
+
+                    if (gameStarted && !isPaused) {
+                        stopTimer();
+                        await generateProblem();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
