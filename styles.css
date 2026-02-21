@@ -924,7 +924,13 @@ h1 {
    PAGE-SPECIFIC LAYOUT ADJUSTMENTS
    ============================================ */
 
-/* Spelling Page */
+/* Spelling Page - no scrolling */
+.page-spelling {
+    overflow: hidden;
+    height: 100vh;
+    padding: 20px;
+}
+
 .page-spelling .left-panel {
     top: 25%;
     transform: none;
@@ -941,18 +947,36 @@ h1 {
 }
 
 .page-spelling .right-panel {
-    top: 20%;
+    top: 10%;
     transform: none;
+}
+
+.page-spelling .right-panel .score-board {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 15px;
+    margin: 0;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
 }
 
 .page-spelling .right-panel .rewards-bank {
     height: auto;
-    min-height: 400px;
-    max-height: 70vh;
+    min-height: 300px;
+    max-height: 55vh;
 }
 
 .page-spelling .container {
-    max-width: 600px;
+    max-width: 750px;
+    max-height: none;
+    overflow: visible;
+}
+
+.page-spelling .answer-input {
+    width: 90%;
+    max-width: 500px;
+    font-size: 2.2em;
+    padding: 18px 20px;
+    letter-spacing: 1px;
 }
 
 .page-spelling .pronounce-btn {
@@ -1744,8 +1768,9 @@ h1 {
 
 .chess-controls-panel .answer-input {
     width: 100%;
-    font-size: 1.15em;
-    padding: 12px;
+    font-size: 1.5em;
+    padding: 16px 20px;
+    letter-spacing: 1px;
 }
 
 .chess-controls-panel .submit-btn {
@@ -1791,79 +1816,60 @@ h1 {
     padding: 2px;
 }
 
-/* Move indicator - vertical strip to the right of the board */
-.chess-move-indicator {
+/* Turn banner - below the right controls panel */
+.chess-turn-banner {
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-self: center;
-}
-
-.move-checkbox {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px;
-    border-radius: 10px;
-    cursor: default;
-    user-select: none;
-}
-
-.move-checkbox.white-check {
-    background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.25);
-}
-
-.move-checkbox.black-check {
-    background: rgba(40, 40, 40, 0.95);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.35);
-}
-
-.move-check-box {
-    display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: 16px;
+    margin-top: 15px;
+    transition: all 0.3s ease;
+}
+
+.chess-turn-banner.white-turn-banner {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.chess-turn-banner.black-turn-banner {
+    background: rgba(30, 30, 30, 0.95);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.turn-color-box {
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.turn-color-box.white-box {
+    background: #fff;
     border: 3px solid #999;
-    border-radius: 5px;
-    background: transparent;
-    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.move-check-box.checked {
-    border-color: #4caf50;
-    background: #4caf50;
+.turn-color-box.black-box {
+    background: #1a1a1a;
+    border: 3px solid #555;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
-.move-check-box.checked::after {
-    content: '\2713';
-    color: #fff;
-    font-size: 15px;
+.turn-text {
+    font-size: 1.1em;
     font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-.white-check .move-check-box {
-    border-color: #aaa;
+.white-turn-banner .turn-text {
+    color: #333;
 }
 
-.black-check .move-check-box {
-    border-color: #666;
-}
-
-.move-piece-icon {
-    font-size: 1.4em;
-    line-height: 1;
-}
-
-.move-piece-icon.white-icon {
+.black-turn-banner .turn-text {
     color: #fff;
-    text-shadow: -1px -1px 0 #333, 1px -1px 0 #333, -1px 1px 0 #333, 1px 1px 0 #333;
-}
-
-.move-piece-icon.black-icon {
-    color: #fff;
-    text-shadow: none;
 }
 
 .chess-square {
@@ -2034,9 +2040,9 @@ h1 {
     .chess-controls-panel .timer-container { padding: 10px; margin-bottom: 8px; }
     .chess-controls-panel .problem-area { padding: 10px; }
 
-    .chess-move-indicator {
-        flex-direction: row;
-        gap: 8px;
+    .chess-turn-banner {
+        padding: 10px 16px;
+        margin-top: 10px;
     }
 }
 
@@ -2063,12 +2069,17 @@ h1 {
         grid-template-columns: 18px repeat(8, 1fr);
     }
 
-    .move-check-box {
-        width: 18px;
-        height: 18px;
+    .chess-turn-banner {
+        padding: 8px 12px;
+        margin-top: 8px;
     }
 
-    .move-piece-icon {
-        font-size: 1.1em;
+    .turn-color-box {
+        width: 22px;
+        height: 22px;
+    }
+
+    .turn-text {
+        font-size: 0.9em;
     }
 }

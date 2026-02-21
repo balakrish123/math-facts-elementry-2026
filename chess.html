@@ -48,16 +48,6 @@
             <div class="chess-board-container" id="chessBoardContainer" style="display: none;">
                 <div class="chess-board" id="chessBoard"></div>
             </div>
-            <div class="chess-move-indicator" id="moveIndicator">
-                <div class="move-checkbox white-check" title="White to move">
-                    <span class="move-check-box" id="whiteCheck"></span>
-                    <span class="move-piece-icon white-icon">♔</span>
-                </div>
-                <div class="move-checkbox black-check" title="Black to move">
-                    <span class="move-check-box" id="blackCheck"></span>
-                    <span class="move-piece-icon black-icon">♚</span>
-                </div>
-            </div>
         </div>
 
         <div class="chess-controls-panel">
@@ -74,6 +64,11 @@
                 <div class="keyboard-hint">Type your move in algebraic notation (e.g., Qh7, Rxf8, Nf6) and press Enter ↵</div>
                 <button class="submit-btn" id="submit" disabled>Check Move ♟️</button>
                 <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div class="chess-turn-banner" id="turnBanner">
+                <div class="turn-color-box" id="turnColorBox"></div>
+                <span class="turn-text" id="turnText">White to move</span>
             </div>
         </div>
     </div>
@@ -212,11 +207,19 @@
 
             document.getElementById('chessBoardContainer').style.display = 'flex';
 
-            // Update move indicator checkboxes
-            const whiteCheck = document.getElementById('whiteCheck');
-            const blackCheck = document.getElementById('blackCheck');
-            whiteCheck.classList.toggle('checked', turnChar === 'w');
-            blackCheck.classList.toggle('checked', turnChar !== 'w');
+            // Update turn banner
+            const turnColorBox = document.getElementById('turnColorBox');
+            const turnText = document.getElementById('turnText');
+            const turnBanner = document.getElementById('turnBanner');
+            if (turnChar === 'w') {
+                turnColorBox.className = 'turn-color-box white-box';
+                turnText.textContent = 'White to move';
+                turnBanner.className = 'chess-turn-banner white-turn-banner';
+            } else {
+                turnColorBox.className = 'turn-color-box black-box';
+                turnText.textContent = 'Black to move';
+                turnBanner.className = 'chess-turn-banner black-turn-banner';
+            }
         }
 
         // Generate a chess puzzle
