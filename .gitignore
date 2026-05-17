@@ -10,5 +10,11 @@
 *.swo
 *~
 
+# Local CDN fallback libraries (run curl commands in README to set up)
+lib/
+
+# Puzzle generator script (dev only)
+generate_puzzles.py
+
 # Environment
 .env

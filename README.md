@@ -1,39 +1,57 @@
-# Elementary Learning Hub
+# Elementary Learning Hub 2026
 
-An interactive, kid-friendly web application for elementary students to practice Math, Spelling, Vocabulary, Geography, and Science.
+An interactive, kid-friendly web application for elementary students to practice Math, Spelling, Vocabulary, Geography, Science, Measurement, and Chess Puzzles.
+
+## Live Site
+
+**https://balakrish123.github.io/math-facts-elementry-2026/**
+
+| Page | Link |
+|------|------|
+| Home / Login | [index.html](https://balakrish123.github.io/math-facts-elementry-2026/index.html) |
+| Math | [math.html](https://balakrish123.github.io/math-facts-elementry-2026/math.html) |
+| Spelling | [spelling.html](https://balakrish123.github.io/math-facts-elementry-2026/spelling.html) |
+| Vocabulary | [vocabulary.html](https://balakrish123.github.io/math-facts-elementry-2026/vocabulary.html) |
+| Science | [science.html](https://balakrish123.github.io/math-facts-elementry-2026/science.html) |
+| Geography | [geography.html](https://balakrish123.github.io/math-facts-elementry-2026/geography.html) |
+| Measurement | [measurement.html](https://balakrish123.github.io/math-facts-elementry-2026/measurement.html) |
+| Chess Puzzles | [chess.html](https://balakrish123.github.io/math-facts-elementry-2026/chess.html) |
 
 ## 🎯 Features
 
 ### Core Features (All Subjects)
 - **Login System** - Secure access with demo accounts
-- **5 Complete Subjects** - Math, Spelling, Vocabulary, Science, Geography
+- **7 Complete Subjects** - Math, Spelling, Vocabulary, Science, Geography, Measurement, Chess
 - **Rewards System** - Earn 120+ emoji rewards (animals, vehicles, treats, etc.)
 - **45-Second Timer** - Challenge mode with pause/resume functionality
 - **Sound Effects** - Audio feedback for correct/incorrect answers
 - **Score Tracking** - Track correct answers, streak, and total attempts
 - **Responsive Design** - Works on desktop, tablet, and mobile
 - **Fun Break Messages** - 30 themed break messages when paused
-- **No Dependencies** - Pure HTML/CSS/JavaScript, works offline
+- **No Build Process** - Pure HTML/CSS/JavaScript, works offline
 
 ## 📁 File Structure
 
 ```
 math-facts-elementry-2026/
 ├── index.html              # Login & Subject Selection
-├── styles.css              # Shared styles for all pages (1,228 lines)
+├── styles.css              # Shared styles for all pages
 ├── common.js               # Shared JavaScript functions (rewards, timer, sounds)
 ├── math.html               # Math Facts Practice ✅ COMPLETE
 ├── spelling.html           # Spelling Practice ✅ COMPLETE (with M-W API)
-├── spelling-words.js       # 750 Spelling words from Indiana Spell Bowl
+├── spelling-words.js       # 2026 Elementary Spell Bowl word list
 ├── vocabulary.html         # Vocabulary Builder ✅ COMPLETE
 ├── vocabulary-words.js     # 99 Vocabulary words (Word Wizard 3rd-5th)
 ├── science.html            # Science Practice ✅ COMPLETE
 ├── science-questions.js    # 80 Science questions (multiple choice)
-├── geography.html          # Geography Practice (Template)
+├── geography.html          # Geography Practice ✅ COMPLETE
+├── measurement.html        # Measurement Practice ✅ COMPLETE
+├── chess.html              # Chess Puzzles ✅ COMPLETE (interactive board)
+├── puzzles-easy.js         # 500 easy chess puzzles (from Lichess)
+├── puzzles-medium.js       # 500 medium chess puzzles
+├── puzzles-hard.js         # 250 hard chess puzzles
+├── lib/                    # Local CDN fallback (git-ignored, see setup below)
 ├── MERRIAM_WEBSTER_SETUP.md  # Setup guide for M-W API
-├── 3738-science-trivia-for-kids.pdf  # Source: Science trivia
-├── science.pdf             # Source: Grade 4 Science Test
-├── WordWizardVocabList3-5.pdf        # Source: Vocabulary words
 └── README.md               # This file
 ```
 
@@ -65,7 +83,9 @@ For **professional audio pronunciation** and **automatic definitions** on the sp
 | 📝 Spelling | ✅ COMPLETE | 750 words | Type spelling | Text-to-speech, Timer |
 | 📖 Vocabulary | ✅ COMPLETE | 99 words | Flashcards | 10s auto-reveal, Progress |
 | 🔬 Science | ✅ COMPLETE | 80 questions | Multiple choice | Categories, Timer, Puzzle |
-| 🌍 Geography | ⏳ Template | 0 | TBD | Coming soon |
+| 🌍 Geography | ✅ COMPLETE | — | Multiple choice | Maps, Timer |
+| 📏 Measurement | ✅ COMPLETE | — | Input answer | Timer, Rewards |
+| ♟️ Chess | ✅ COMPLETE | 1,250 puzzles | Drag & drop / Type | Interactive board, Lichess link |
 
 ## 📚 Subject Details
 
@@ -154,13 +174,44 @@ For **professional audio pronunciation** and **automatic definitions** on the sp
 - Diagnose, Dilemma, Diploma, Dynasty, Eclipse
 - And 84 more challenging vocabulary words!
 
-### 🌍 Geography Practice (Coming Soon)
+### ♟️ Chess Puzzles (COMPLETE)
 
-Planned features:
-- Countries & capitals
-- States & cities
-- Continents & oceans
-- Interactive maps (future)
+**1,250 Puzzles** from the [Lichess open database](https://database.lichess.org/#puzzles) (CC0 license)
+
+**Difficulty Levels:**
+- Easy: 500 puzzles (Mate in 1, simple tactics, rating ≤1600)
+- Medium: 500 puzzles (Mate in 2, tactical puzzles, rating ≤1800)
+- Hard: 250 puzzles (Mate in 2-5, advanced tactics, rating ≤2200)
+
+**Interactive Board** powered by [chessground](https://github.com/lichess-org/chessground):
+- **Drag & drop** pieces to make moves
+- **Legal move hints** shown as dots on valid squares
+- **Auto-orientation** — board flips to the side that needs to move
+- **Type Move** mode available as alternative input
+
+**Special Features:**
+- **"Try on Lichess"** link on each puzzle to practice on [lichess.org](https://lichess.org)
+- Puzzle rating displayed for each problem
+- Category badges (Mate in 1, Fork, Pin, Skewer, etc.)
+- CDN loading with local fallback (see setup below)
+
+**Refreshing Puzzles:**
+1. Download the latest database: https://database.lichess.org/puzzles/lichess_db_puzzle.csv.zst
+2. Place it at `~/Downloads/lichess_db_puzzle.csv.zst`
+3. Run: `python3 generate_puzzles.py`
+4. Requires `python-chess` (`pip install chess`) and `zstd`
+
+**CDN Fallback Setup** (local backup for chess libraries):
+```sh
+mkdir -p lib/chessground lib/chess
+curl -sL -o lib/chessground/chessground.base.css "https://unpkg.com/chessground@9.1.1/assets/chessground.base.css"
+curl -sL -o lib/chessground/chessground.brown.css "https://unpkg.com/chessground@9.1.1/assets/chessground.brown.css"
+curl -sL -o lib/chessground/chessground.cburnett.css "https://unpkg.com/chessground@9.1.1/assets/chessground.cburnett.css"
+curl -sL -o lib/chessground/chessground.min.js "https://unpkg.com/chessground@9.1.1/dist/chessground.min.js"
+curl -sL -o lib/chess/chess.min.js "https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"
+```
+
+### 🌍 Geography Practice (COMPLETE)
 
 ### 🔬 Science Practice (COMPLETE)
 
@@ -441,6 +492,13 @@ The app uses `sessionStorage` to remember login:
 - **Total Words**: 99 (selected from comprehensive list)
 - **Content**: Academic vocabulary with definitions
 
+### Chess Puzzles
+- **Source**: [Lichess Puzzle Database](https://database.lichess.org/#puzzles)
+- **License**: CC0 (public domain)
+- **Total Puzzles**: 1,250 (500 easy + 500 medium + 250 hard)
+- **Board Library**: [chessground](https://github.com/lichess-org/chessground) by Lichess (GPL-3.0)
+- **Move Validation**: [chess.js](https://github.com/jhlywa/chess.js) (MIT)
+
 ## ✨ What's New
 
 ### Latest Updates (January 2026)
@@ -456,11 +514,14 @@ The app uses `sessionStorage` to remember login:
 - ✅ **Fixed Pause/Resume** - Works perfectly on all pages
 - ✅ **Layout Improvements** - No overlapping panels
 
-### Complete Subjects (4 of 5)
+### Complete Subjects (7 of 7)
 1. **Math Facts** - 12 operations, 16-piece puzzle, unlimited questions
 2. **Spelling** - 750 words, text-to-speech, second-chance system
 3. **Science** - 80 questions, multiple choice, 7 categories
 4. **Vocabulary** - 99 words, flashcard learning, auto-reveal
+5. **Geography** - Geography questions with maps
+6. **Measurement** - Measurement practice
+7. **Chess Puzzles** - 1,250 Lichess puzzles, interactive drag-and-drop board
 
 ## 📊 Application Statistics
 
@@ -490,7 +551,9 @@ None currently! Report any issues you find.
 - [x] ~~Merriam-Webster pronunciation~~ ✅ COMPLETE (with API integration)
 - [x] ~~Word definitions in spelling~~ ✅ COMPLETE (auto-display)
 - [x] ~~Logout functionality~~ ✅ COMPLETE
-- [ ] Geography questions with maps
+- [x] ~~Geography questions~~ ✅ COMPLETE
+- [x] ~~Measurement practice~~ ✅ COMPLETE
+- [x] ~~Chess puzzles with interactive board~~ ✅ COMPLETE (1,250 Lichess puzzles)
 - [ ] Progress tracking across sessions (localStorage)
 - [ ] Printable certificates
 - [ ] Teacher dashboard
@@ -502,20 +565,16 @@ None currently! Report any issues you find.
 
 ## 🎯 Quick Feature Comparison
 
-| Feature | Math | Spelling | Vocabulary | Science |
-|---------|------|----------|------------|---------|
-| Timer | ✅ 45s | ✅ 45s | ❌ Auto | ✅ 45s |
-| Pause/Resume | ✅ | ✅ | ❌ | ✅ |
-| Jigsaw Puzzle | ✅ 16pc | ❌ | ❌ | ✅ 16pc |
-| Rewards Bank | ✅ | ✅ | ❌ | ✅ |
-| Difficulty Levels | ✅ 3 | ✅ 3 | ❌ | ✅ 3 |
-| Sound Effects | ✅ | ✅ | ✅ | ✅ |
-| Score Tracking | ✅ | ✅ | ✅ Progress | ✅ |
-| Side Panels | ✅ | ✅ Small | ❌ Clean | ✅ |
-| Input Method | Type | Type | None | Click |
-| Definitions | ❌ | ✅ M-W API | ✅ Built-in | ❌ |
-| Pronunciation | ❌ | ✅ M-W Audio | ❌ | ❌ |
-| Special Feature | Fractions | M-W Dictionary | Auto-reveal | Categories |
+| Feature | Math | Spelling | Vocabulary | Science | Chess |
+|---------|------|----------|------------|---------|-------|
+| Timer | ✅ 45s | ✅ 45s | ❌ Auto | ✅ 45s | ✅ 90s |
+| Pause/Resume | ✅ | ✅ | ❌ | ✅ | ✅ |
+| Jigsaw Puzzle | ✅ 16pc | ❌ | ❌ | ✅ 16pc | ❌ |
+| Difficulty Levels | ✅ 3 | ✅ 3 | ❌ | ✅ 3 | ✅ 3 |
+| Sound Effects | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Score Tracking | ✅ | ✅ | ✅ Progress | ✅ | ✅ |
+| Input Method | Type | Type | None | Click | Drag / Type |
+| Special Feature | Fractions | M-W Dictionary | Auto-reveal | Categories | Lichess link |
 
 ## 💡 Tips for Best Experience
 
@@ -542,6 +601,6 @@ For questions or issues, please refer to the code comments or contact the develo
 
 **Made with ❤️ for elementary learners**
 
-**Version**: 2.0 (January 2026)
-**Subjects Complete**: 4/5 (Math, Spelling, Vocabulary, Science)
-**Total Learning Items**: 929+ questions and words
+**Version**: 3.0 (May 2026)
+**Subjects Complete**: 7/7 (Math, Spelling, Vocabulary, Science, Geography, Measurement, Chess)
+**Total Learning Items**: 2,179+ questions, words, and puzzles
