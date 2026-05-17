@@ -406,8 +406,19 @@
             playWrongSound();
 
             disableBoard();
+
+            // Animate the correct move on the board so the user can see it
             if (ground) {
-                ground.set({ lastMove: [currentPuzzle.uciFrom, currentPuzzle.uciTo] });
+                const chess = new Chess(currentPuzzle.fen);
+                const move = chess.move({ from: currentPuzzle.uciFrom, to: currentPuzzle.uciTo, promotion: currentPuzzle.uciPromotion || undefined });
+                if (move) {
+                    ground.set({
+                        fen: chess.fen(),
+                        lastMove: [currentPuzzle.uciFrom, currentPuzzle.uciTo]
+                    });
+                } else {
+                    ground.set({ lastMove: [currentPuzzle.uciFrom, currentPuzzle.uciTo] });
+                }
             }
 
             updateScoreboard();
@@ -417,7 +428,7 @@
                 if (!isPaused && gameStarted) {
                     generateProblem();
                 }
-            }, 3000);
+            }, 5000);
         };
 
         // Expose generateProblem for common.js start button
