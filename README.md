@@ -57,12 +57,26 @@ math-facts-elementry-2026/
 
 ## 🚀 Quick Start
 
-1. **Open the app**: Open `index.html` in any web browser
+### Running Locally
+
+The Chess Puzzles page uses ES modules, so it must be served over HTTP (opening `file://` directly won't work). Start a local server:
+
+```sh
+python3 -m http.server 8080
+```
+
+Then open http://localhost:8080
+
+> **Note:** All other pages (Math, Spelling, etc.) work fine when opened directly in a browser. Only the Chess page requires a local server due to ES module imports.
+
+### Login
+
+1. **Open the app**: Open `index.html` (or http://localhost:8080)
 2. **Login**: Use a demo account:
    - student / math123
    - teacher / teach456
    - admin / admin789
-3. **Choose a subject**: Click on any subject card (Math, Spelling, Vocabulary, Science)
+3. **Choose a subject**: Click on any subject card
 4. **Start practicing**: Click "Start ▶️" to begin!
 
 ### 🎤 Optional: Enable Merriam-Webster Pronunciation (Recommended)
