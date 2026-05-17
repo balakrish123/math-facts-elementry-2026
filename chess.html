@@ -59,7 +59,7 @@
         <div class="chess-controls-panel">
             <div class="timer-container">
                 <button class="control-btn" id="startBtn">Start ▶️</button>
-                <div class="timer" id="timer">90</div>
+                <div class="timer" id="timer">120</div>
                 <button class="control-btn pause hidden" id="pauseBtn">Pause ⏸️</button>
             </div>
 
@@ -250,50 +250,52 @@
         function onPieceDrop(orig, dest) {
             if (!gameStarted || !currentPuzzle || waitingForNext) return;
 
-            waitingForNext = true;
-            stopTimer();
-            total++;
-
             const isCorrect = orig === currentPuzzle.uciFrom && dest === currentPuzzle.uciTo;
             const feedbackEl = document.getElementById('feedback');
 
             if (isCorrect) {
+                waitingForNext = true;
+                stopTimer();
+                total++;
                 correct++;
                 streak++;
                 feedbackEl.textContent = `🎉 Correct! ${currentPuzzle.answer} is right!`;
                 feedbackEl.className = 'feedback correct celebrating';
                 playCorrectSound();
                 disableBoard();
+                updateScoreboard();
+
+                setTimeout(() => {
+                    waitingForNext = false;
+                    if (!isPaused && gameStarted) {
+                        generateProblem();
+                    }
+                }, 1500);
             } else {
-                streak = 0;
-                wrongCount++;
-                document.getElementById('wrong').textContent = wrongCount;
-                feedbackEl.textContent = `Not quite. The correct move is ${currentPuzzle.answer}`;
+                feedbackEl.textContent = `Not quite. Try again!`;
                 feedbackEl.className = 'feedback incorrect';
                 playWrongSound();
 
-                // Reset board to puzzle position and show correct move
+                // Reset board to puzzle position and let them try again
                 setTimeout(() => {
                     if (ground) {
+                        const turnChar = currentPuzzle.fen.split(' ')[1] || 'w';
+                        const turnColor = turnChar === 'w' ? 'white' : 'black';
                         ground.set({
                             fen: currentPuzzle.fen,
-                            lastMove: [currentPuzzle.uciFrom, currentPuzzle.uciTo],
-                            movable: { color: undefined, dests: new Map() },
-                            draggable: { enabled: false }
+                            turnColor: turnColor,
+                            movable: {
+                                free: false,
+                                color: turnColor,
+                                dests: getLegalDests(currentPuzzle.fen),
+                                showDests: true,
+                                events: { after: onPieceDrop }
+                            },
+                            draggable: { enabled: true }
                         });
                     }
-                }, 300);
+                }, 500);
             }
-
-            updateScoreboard();
-
-            const delay = isCorrect ? 1500 : 2500;
-            setTimeout(() => {
-                waitingForNext = false;
-                if (!isPaused && gameStarted) {
-                    generateProblem();
-                }
-            }, delay);
         }
 
         async function generateProblem() {
@@ -353,47 +355,39 @@
                 return;
             }
 
-            waitingForNext = true;
-            stopTimer();
-            total++;
-
             const normalizedAnswer = userAnswer.replace(/[\s]/g, '');
             const isCorrect = currentPuzzle.acceptedAnswers.some(
                 accepted => accepted.toLowerCase() === normalizedAnswer.toLowerCase()
             );
 
-            disableBoard();
-
             if (isCorrect) {
+                waitingForNext = true;
+                stopTimer();
+                total++;
                 correct++;
                 streak++;
                 feedbackEl.textContent = `🎉 Correct! ${currentPuzzle.answer} is right!`;
                 feedbackEl.className = 'feedback correct celebrating';
                 playCorrectSound();
+                disableBoard();
                 if (ground) {
                     ground.set({ lastMove: [currentPuzzle.uciFrom, currentPuzzle.uciTo] });
                 }
+                updateScoreboard();
+
+                setTimeout(() => {
+                    waitingForNext = false;
+                    if (!isPaused && gameStarted) {
+                        generateProblem();
+                    }
+                }, 1500);
             } else {
-                streak = 0;
-                wrongCount++;
-                document.getElementById('wrong').textContent = wrongCount;
-                feedbackEl.textContent = `Not quite. The correct move is ${currentPuzzle.answer}`;
+                feedbackEl.textContent = `Not quite. Try again!`;
                 feedbackEl.className = 'feedback incorrect';
                 playWrongSound();
-                if (ground) {
-                    ground.set({ lastMove: [currentPuzzle.uciFrom, currentPuzzle.uciTo] });
-                }
+                document.getElementById('answer').value = '';
+                document.getElementById('answer').focus();
             }
-
-            updateScoreboard();
-
-            const delay = isCorrect ? 1500 : 2500;
-            setTimeout(() => {
-                waitingForNext = false;
-                if (!isPaused && gameStarted) {
-                    generateProblem();
-                }
-            }, delay);
         }
 
         // Expose for common.js handleTimeout callback
