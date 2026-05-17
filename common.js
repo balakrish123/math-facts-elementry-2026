@@ -1,22 +1,22 @@
 // Common variables and functions shared across all practice pages
 
-// Game state
-let correct = 0;
-let total = 0;
-let streak = 0;
-let soundEnabled = true;
-const timerDuration = parseInt(document.getElementById('timer')?.textContent) || 45;
-let timeLeft = timerDuration;
-let timerInterval = null;
-let puzzlePiecesRevealed = 0;
-const totalPuzzlePieces = 16;
-const rewardsPerPiece = 5;
-let currentDraggingPiece = null;
-let timerPaused = false;
-let pendingPieceIndex = null;
-let gameStarted = false;
-let isPaused = false;
-let rewards = [];
+// Game state (var so module scripts can access them via window)
+var correct = 0;
+var total = 0;
+var streak = 0;
+var soundEnabled = true;
+var timerDuration = parseInt(document.getElementById('timer')?.textContent) || 45;
+var timeLeft = timerDuration;
+var timerInterval = null;
+var puzzlePiecesRevealed = 0;
+var totalPuzzlePieces = 16;
+var rewardsPerPiece = 5;
+var currentDraggingPiece = null;
+var timerPaused = false;
+var pendingPieceIndex = null;
+var gameStarted = false;
+var isPaused = false;
+var rewards = [];
 
 // Reward emojis
 const rewardEmojis = [

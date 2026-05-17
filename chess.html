@@ -59,7 +59,7 @@
         <div class="chess-controls-panel">
             <div class="timer-container">
                 <button class="control-btn" id="startBtn">Start ▶️</button>
-                <div class="timer" id="timer">120</div>
+                <div class="timer" id="timer">45</div>
                 <button class="control-btn pause hidden" id="pauseBtn">Pause ⏸️</button>
             </div>
 
@@ -89,7 +89,7 @@
         </div>
     </div>
 
-    <script src="common.js"></script>
+    <script src="common.js?v=2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"
             onerror="var s=document.createElement('script');s.src='lib/chess/chess.min.js';document.head.appendChild(s);"></script>
     <script type="module">
@@ -109,6 +109,14 @@
         let ground = null;
         let inputMode = 'drag';
         let waitingForNext = false;
+
+        const timerByDifficulty = { easy: 45, medium: 75, hard: 90 };
+
+        function setTimerForDifficulty(level) {
+            timerDuration = timerByDifficulty[level] || 45;
+            timeLeft = timerDuration;
+            document.getElementById('timer').textContent = timerDuration;
+        }
 
         const puzzleCache = {};
 
@@ -183,6 +191,9 @@
             const orientation = turnChar === 'w' ? 'white' : 'black';
             const turnColor = turnChar === 'w' ? 'white' : 'black';
 
+            // Container must be visible before chessground can calculate dimensions
+            document.getElementById('chessBoardContainer').style.display = 'flex';
+
             const config = {
                 fen: fen,
                 orientation: orientation,
@@ -221,8 +232,6 @@
             } else {
                 ground = Chessground(boardEl, config);
             }
-
-            document.getElementById('chessBoardContainer').style.display = 'flex';
 
             const turnColorBox = document.getElementById('turnColorBox');
             const turnText = document.getElementById('turnText');
@@ -276,24 +285,9 @@
                 feedbackEl.className = 'feedback incorrect';
                 playWrongSound();
 
-                // Reset board to puzzle position and let them try again
+                // Fully re-render board to reset after chessground applied the wrong move
                 setTimeout(() => {
-                    if (ground) {
-                        const turnChar = currentPuzzle.fen.split(' ')[1] || 'w';
-                        const turnColor = turnChar === 'w' ? 'white' : 'black';
-                        ground.set({
-                            fen: currentPuzzle.fen,
-                            turnColor: turnColor,
-                            movable: {
-                                free: false,
-                                color: turnColor,
-                                dests: getLegalDests(currentPuzzle.fen),
-                                showDests: true,
-                                events: { after: onPieceDrop }
-                            },
-                            draggable: { enabled: true }
-                        });
-                    }
+                    renderChessBoard(currentPuzzle.fen);
                 }, 500);
             }
         }
@@ -315,6 +309,7 @@
             currentPuzzle = puzzles[puzzleIndex];
             waitingForNext = false;
 
+            setTimerForDifficulty(difficulty);
             document.getElementById('problem').textContent = currentPuzzle.question;
 
             const categoryBadge = document.getElementById('categoryBadge');
