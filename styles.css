@@ -2022,3 +2022,312 @@ h1 {
         font-size: 0.9em;
     }
 }
+
+/* ============================================
+   ROBOTICS PAGE STYLES
+   ============================================ */
+
+.page-robotics {
+    overflow: hidden;
+    height: 100vh;
+    padding: 20px;
+}
+
+.page-robotics .left-panel {
+    top: 25%;
+    transform: none;
+    max-width: 220px;
+}
+
+.page-robotics .difficulty-selector-left {
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.page-robotics .difficulty-title {
+    font-weight: bold;
+    color: #667eea;
+    margin-bottom: 12px;
+    font-size: 0.95em;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.page-robotics .difficulty-selector-left .difficulty-btn {
+    font-size: 0.9em;
+    padding: 10px;
+    margin-bottom: 8px;
+}
+
+.page-robotics .difficulty-selector-left ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.page-robotics .difficulty-selector-left li {
+    padding: 4px 0;
+    font-size: 0.85em;
+    line-height: 1.4;
+}
+
+.page-robotics .right-panel {
+    top: 10%;
+    transform: none;
+}
+
+.page-robotics .right-panel .score-board {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 15px;
+    margin: 0;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+}
+
+.page-robotics .right-panel .rewards-bank {
+    height: auto;
+    min-height: 300px;
+    max-height: 55vh;
+}
+
+.page-robotics .container {
+    max-width: 750px;
+    max-height: none;
+    overflow: visible;
+}
+
+/* Options grid for robotics */
+.page-robotics .options-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 25px;
+    margin-bottom: 20px;
+}
+
+.page-robotics .option-btn {
+    padding: 18px 25px;
+    font-size: 1.1em;
+    background: linear-gradient(135deg, #f0f4ff 0%, #fef3ff 100%);
+    color: var(--text-color);
+    border: 3px solid #e0e7ff;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(102, 126, 234, 0.1);
+    text-align: left;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.page-robotics .option-letter {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 35px;
+    height: 35px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 8px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.page-robotics .option-btn:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+    border-color: var(--primary-color);
+    background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+}
+
+.page-robotics .option-btn:active:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.page-robotics .option-btn.correct {
+    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+    border-color: var(--success-color);
+    color: #166534;
+    animation: correctPulse 0.5s ease;
+}
+
+.page-robotics .option-btn.incorrect {
+    background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+    border-color: var(--error-color);
+    color: #991b1b;
+    animation: incorrectShake 0.5s ease;
+}
+
+.page-robotics .option-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* True/False buttons */
+.page-robotics .true-btn,
+.page-robotics .false-btn {
+    padding: 20px 25px;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* Matching styles */
+.page-robotics .match-part-card {
+    cursor: pointer !important;
+    transition: all 0.3s ease;
+}
+
+.page-robotics .match-part-card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+}
+
+.page-robotics .match-option-btn {
+    cursor: pointer !important;
+    transition: all 0.3s ease;
+}
+
+.page-robotics .match-option-btn:hover {
+    transform: translateX(5px);
+    box-shadow: 0 6px 20px rgba(251, 191, 36, 0.3);
+}
+
+.page-robotics .match-option-btn:disabled {
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+#submitMatchBtn {
+    margin-top: 20px !important;
+    padding: 15px 40px !important;
+    background: linear-gradient(135deg, var(--success-color) 0%, var(--success-dark) 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 15px !important;
+    cursor: pointer !important;
+    font-size: 1.1em !important;
+    font-weight: bold !important;
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4) !important;
+    transition: all 0.3s ease !important;
+}
+
+#submitMatchBtn:hover {
+    transform: scale(1.05) translateY(-2px) !important;
+    box-shadow: 0 10px 30px rgba(34, 197, 94, 0.5) !important;
+}
+
+/* Responsive adjustments for robotics page */
+@media (max-width: 1200px) {
+    .page-robotics .left-panel {
+        max-width: 200px;
+        min-width: 180px;
+    }
+
+    .page-robotics .difficulty-selector-left .difficulty-btn {
+        font-size: 0.9em;
+        padding: 9px 10px;
+    }
+}
+
+@media (max-width: 900px) {
+    .page-robotics .left-panel {
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none;
+        margin: 20px auto;
+        max-width: 400px;
+    }
+
+    .page-robotics .right-panel {
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none;
+        margin: 20px auto;
+        max-width: 400px;
+    }
+}
+
+/* Resource Links - General */
+a[href*="sciencebuddies"],
+a[href*="scratch.mit"],
+a[href*="vex.com"] {
+    transition: all 0.3s ease;
+}
+
+a[href*="sciencebuddies"]:hover,
+a[href*="scratch.mit"]:hover,
+a[href*="vex.com"]:hover {
+    transform: translateY(-5px) scale(1.05);
+    box-shadow: 0 12px 30px rgba(102, 126, 234, 0.4) !important;
+    background: linear-gradient(135deg, var(--success-color) 0%, var(--success-dark) 100%) !important;
+    border-color: var(--success-dark) !important;
+    color: white !important;
+}
+
+a[href*="sciencebuddies"]:active,
+a[href*="scratch.mit"]:active,
+a[href*="vex.com"]:active {
+    transform: translateY(-2px) scale(1.02);
+}
+
+/* Resource Links - Robotics Page */
+.page-robotics a[href*="sciencebuddies"],
+.page-robotics a[href*="scratch"],
+.page-robotics a[href*="vex"] {
+    transition: all 0.3s ease;
+}
+
+.page-robotics a[href*="sciencebuddies"]:hover,
+.page-robotics a[href*="scratch"]:hover,
+.page-robotics a[href*="vex"]:hover {
+    background: linear-gradient(135deg, #fde68a 0%, #fed7aa 100%) !important;
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.4) !important;
+    border-color: #d97706 !important;
+    color: #b45309 !important;
+}
+
+.page-robotics a[href*="sciencebuddies"]:active,
+.page-robotics a[href*="scratch"]:active,
+.page-robotics a[href*="vex"]:active {
+    transform: translateY(-2px) scale(0.98);
+}
+
+/* Top Resource Links Bar */
+@media (max-width: 768px) {
+    div[style*="position: fixed; top: 80px"] {
+        flex-direction: column !important;
+        gap: 8px !important;
+        padding: 12px !important;
+        top: 75px !important;
+        max-width: 95vw !important;
+    }
+
+    div[style*="position: fixed; top: 80px"] a {
+        max-width: 100% !important;
+        padding: 10px 12px !important;
+        font-size: 0.95em;
+    }
+}
+
+@media (max-width: 768px) {
+    .page-robotics .option-btn {
+        padding: 15px 20px;
+        font-size: 1em;
+    }
+
+    .page-robotics .option-letter {
+        min-width: 30px;
+        height: 30px;
+        font-size: 0.95em;
+    }
+}
+
