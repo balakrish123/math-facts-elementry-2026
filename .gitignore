@@ -5,7 +5,9 @@
 # OS files
 .DS_Store
 
-# Editor files
+# Editor / AI tool directories
+.idea/
+.claude/
 *.swp
 *.swo
 *~
